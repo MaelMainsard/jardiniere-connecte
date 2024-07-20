@@ -8,6 +8,8 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <EEPROM.h>
+#include <SPI.h>
+#include <Wire.h>
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -32,7 +34,7 @@ private:
     ESP8266WebServer webServer;
     DNSServer dnsServer;
 
-    void initializeDisplay();
+    void resetDisplay();
     void setupWebServerAndDNS();
     void scanAvailableNetworks();
     void connectToWiFi(const String& ssid, const String& password);

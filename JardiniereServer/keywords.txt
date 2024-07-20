@@ -1,7 +1,7 @@
-JardiniereServer   KEYWORD1
+JardiniereServer   KEYWORD2
 begin              KEYWORD2
 loop               KEYWORD2
-initializeDisplay  KEYWORD2
+resetDisplay  KEYWORD2
 setupWebServerAndDNS  KEYWORD2
 scanAvailableNetworks  KEYWORD2
 connectToWiFi      KEYWORD2

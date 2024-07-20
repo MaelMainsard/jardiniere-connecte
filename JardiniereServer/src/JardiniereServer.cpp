@@ -4,6 +4,7 @@ JardiniereServer::JardiniereServer(const String& deviceName)
     : deviceName(deviceName), display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET), webServer(80) {}
 
 void JardiniereServer::begin() {
+    display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDRESS);
     scanAvailableNetworks();
     setupWebServerAndDNS();
 
@@ -11,6 +12,7 @@ void JardiniereServer::begin() {
     if (readWiFiCredentials(ssid, password)) {
         connectToWiFi(ssid, password);
     } else {
+		resetDisplay();
         display.println("Connect to this WiFi to configure the device.");
         display.display();
     }
@@ -21,16 +23,16 @@ void JardiniereServer::loop() {
     webServer.handleClient();
 }
 
-void JardiniereServer::initializeDisplay() {
-    display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDRESS);
+void JardiniereServer::resetDisplay() {
     display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(WHITE);
     display.setCursor(0, 0);
+    display.display();
 }
 
 void JardiniereServer::setupWebServerAndDNS() {
-    initializeDisplay();
+    resetDisplay();
     WiFi.softAP(deviceName);
     dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
 
@@ -50,32 +52,34 @@ void JardiniereServer::scanAvailableNetworks() {
 }
 
 void JardiniereServer::connectToWiFi(const String& ssid, const String& password) {
-    initializeDisplay();
+    resetDisplay();
     display.println("Connecting to WiFi");
     display.display();
 
     WiFi.begin(ssid.c_str(), password.c_str());
     int attempt = 0;
 
-    while (WiFi.status() != WL_CONNECTED && attempt < 20) {
+    while (WiFi.status() != WL_CONNECTED && attempt < 30) {
         delay(500);
         display.print(".");
         display.display();
         attempt++;
     }
 
-    initializeDisplay();
+    resetDisplay();
     if (WiFi.status() == WL_CONNECTED) {
         display.println("Connected to WiFi: " + WiFi.SSID());
         display.display();
         saveWiFiCredentials(ssid, password);
         webServer.sendHeader("Location", "/disconnect");
         webServer.send(302, "text/plain", "");
+		delay(3000);
+		resetDisplay();
     } else {
         display.println("Failed to connect to WiFi.");
         display.display();
         delay(3000);
-        initializeDisplay();
+        resetDisplay();
         display.println("Connect to this WiFi to configure the device.");
         display.display();
         webServer.sendHeader("Location", "/");
@@ -151,18 +155,18 @@ void JardiniereServer::handleFormSubmission() {
 
 void JardiniereServer::handleDisconnect() {
     if (WiFi.status() == WL_CONNECTED) {
-        initializeDisplay();
         WiFi.disconnect();
-        display.println("WiFi disconnected.");
+		resetDisplay();
+        display.println("WiFi Disconnect.");
         display.display();
-        delay(3000);
-        initializeDisplay();
+        webServer.sendHeader("Location", "/");
+        webServer.send(302, "text/plain", "");
+		delay(3000);
+ 		resetDisplay();
         display.println("Connect to this WiFi to configure the device.");
         display.display();
         clearWiFiCredentials();
     }
-    webServer.sendHeader("Location", "/");
-    webServer.send(302, "text/plain", "");
 }
 
 void JardiniereServer::handleNotFound() {
