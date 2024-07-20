@@ -178,7 +178,7 @@ void JardiniereServer::handleDisconnectPage() {
     webServer.send(200, "text/html", generateDisconnectPageHTML());
 }
 
-bool isServerConnectedToInternet() {
+bool JardiniereServer::isConnectedToInternet() {
     return WiFi.status() == WL_CONNECTED;
 }
 

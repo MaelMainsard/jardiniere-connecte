@@ -22,6 +22,7 @@ public:
     JardiniereServer(const String& deviceName);
     void begin();
     void loop();
+    bool isConnectedToInternet();
 
 private:
     String deviceName;
@@ -47,8 +48,6 @@ private:
 
     String generateMainPageHTML();
     String generateDisconnectPageHTML();
-
-    bool isServerConnectedToInternet();
 };
 
 #endif // JARDINIERESERVER_H

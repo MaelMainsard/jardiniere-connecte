@@ -15,4 +15,4 @@ handleNotFound     KEYWORD2
 handleDisconnectPage  KEYWORD2
 generateMainPageHTML  KEYWORD2
 generateDisconnectPageHTML  KEYWORD2
-isServerConnectedToInternet KEYWORD2
+isConnectedToInternet KEYWORD2
