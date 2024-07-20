@@ -47,6 +47,8 @@ private:
 
     String generateMainPageHTML();
     String generateDisconnectPageHTML();
+
+    bool isServerConnectedToInternet();
 };
 
 #endif // JARDINIERESERVER_H

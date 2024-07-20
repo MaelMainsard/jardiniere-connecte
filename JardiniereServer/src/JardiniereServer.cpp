@@ -4,12 +4,15 @@ JardiniereServer::JardiniereServer(const String& deviceName)
     : deviceName(deviceName), display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET), webServer(80) {}
 
 void JardiniereServer::begin() {
+    scanAvailableNetworks();
+    setupWebServerAndDNS();
+
     String ssid, password;
     if (readWiFiCredentials(ssid, password)) {
         connectToWiFi(ssid, password);
     } else {
-        scanAvailableNetworks();
-        setupWebServerAndDNS();
+        display.println("Connect to this WiFi to configure the device.");
+        display.display();
     }
 }
 
@@ -37,9 +40,6 @@ void JardiniereServer::setupWebServerAndDNS() {
     webServer.on("/submit", HTTP_POST, std::bind(&JardiniereServer::handleFormSubmission, this));
     webServer.onNotFound(std::bind(&JardiniereServer::handleNotFound, this));
     webServer.begin();
-
-    display.println("Connect to this WiFi to configure the device.");
-    display.display();
 }
 
 void JardiniereServer::scanAvailableNetworks() {
@@ -51,7 +51,7 @@ void JardiniereServer::scanAvailableNetworks() {
 
 void JardiniereServer::connectToWiFi(const String& ssid, const String& password) {
     initializeDisplay();
-    display.println("Connecting to WiFi...");
+    display.println("Connecting to WiFi");
     display.display();
 
     WiFi.begin(ssid.c_str(), password.c_str());
@@ -176,6 +176,10 @@ void JardiniereServer::handleNotFound() {
 
 void JardiniereServer::handleDisconnectPage() {
     webServer.send(200, "text/html", generateDisconnectPageHTML());
+}
+
+bool isServerConnectedToInternet() {
+    return WiFi.status() == WL_CONNECTED;
 }
 
 String JardiniereServer::generateMainPageHTML() {
