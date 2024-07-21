@@ -6,15 +6,13 @@
 
 class LedManager {
 public:
-    LedManager(int pinR, int pinG, int pinB);
+    LedManager(int pinR, int pinG);
     void notConnectedToWifi();
     void tryingToConnectToWifi();
-    void isConnectedAndHaveInternet();
-    void failedToConnectToDatabase();
-    void databaseIsConnected();
+    void isConnectedToWifi();
 
 private:
-    int LED_R, LED_G, LED_B;
+    int LED_R, LED_G;
 
     bool LED_G_STATE = LOW;
 

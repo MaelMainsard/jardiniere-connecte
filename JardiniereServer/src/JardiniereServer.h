@@ -15,14 +15,17 @@
 class JardiniereServer {
 public:
     JardiniereServer(const String& deviceName);
+	void begin();
     void loop();
-    bool isInternetAvailable();
 
 private:
     String deviceName;
     String availableSSIDs[MAX_NETWORKS];
     int networkCount;
-	bool onConnect;
+
+    bool attemptingReconnect;
+    unsigned long lastReconnectAttempt;
+    const unsigned long reconnectInterval;
 
     ESP8266WebServer webServer;
     DNSServer dnsServer;
@@ -30,6 +33,7 @@ private:
 
     void setupWebServerAndDNS();
     void scanAvailableNetworks();
+	void scanAndReconnect();
     void connectToWiFi(const String& ssid, const String& password);
     void saveWiFiCredentials(const String& ssid, const String& password);
     bool readWiFiCredentials(String& ssid, String& password);

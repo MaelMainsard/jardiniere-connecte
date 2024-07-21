@@ -1,27 +1,42 @@
 #include "JardiniereServer.h"
 
 JardiniereServer::JardiniereServer(const String& deviceName)
-    : deviceName(deviceName),ledManager(D6, D7, D8), webServer(80), onConnect(false) {}
+    : deviceName(deviceName),ledManager(D6, D7), attemptingReconnect(false),lastReconnectAttempt(0),reconnectInterval(30000),webServer(80){}
 
+
+void JardiniereServer::begin(){
+    setupWebServerAndDNS();
+    scanAvailableNetworks();
+    scanAndReconnect();
+}
 
 void JardiniereServer::loop() {
     dnsServer.processNextRequest();
     webServer.handleClient();
 
-    if(WiFi.status() != WL_CONNECTED && !onConnect){
-        ledManager.notConnectedToWifi();
-
-        scanAvailableNetworks();
-        setupWebServerAndDNS();
-
-        String ssid, password;
-        if (readWiFiCredentials(ssid, password)) {
-            connectToWiFi(ssid, password);
+    String ssid, password;
+    if (WiFi.status() != WL_CONNECTED && readWiFiCredentials(ssid, password)) {
+        unsigned long currentMillis = millis();
+        if (!attemptingReconnect && (currentMillis - lastReconnectAttempt >= reconnectInterval)) {
+            attemptingReconnect = true;
+            lastReconnectAttempt = currentMillis;
+            scanAndReconnect();
+            attemptingReconnect = false;
         }
-
+    }
+    else if(WiFi.status() != WL_CONNECTED && !readWiFiCredentials(ssid, password)){
+        ledManager.notConnectedToWifi();
     }
     else {
-        ledManager.isConnectedAndHaveInternet();
+        ledManager.isConnectedToWifi();
+    }
+
+}
+
+void JardiniereServer::scanAndReconnect() {
+    String ssid, password;
+    if (readWiFiCredentials(ssid, password)) {
+        connectToWiFi(ssid, password);
     }
 }
 
@@ -45,7 +60,6 @@ void JardiniereServer::scanAvailableNetworks() {
 }
 
 void JardiniereServer::connectToWiFi(const String& ssid, const String& password) {
-    onConnect = true;
     ledManager.tryingToConnectToWifi();
 
     WiFi.begin(ssid.c_str(), password.c_str());
@@ -61,10 +75,10 @@ void JardiniereServer::connectToWiFi(const String& ssid, const String& password)
         webServer.sendHeader("Location", "/disconnect");
         webServer.send(302, "text/plain", "");
     } else {
+        ledManager.notConnectedToWifi();
         webServer.sendHeader("Location", "/");
         webServer.send(302, "text/plain", "");
     }
-    onConnect = false;
 }
 
 void JardiniereServer::saveWiFiCredentials(const String& ssid, const String& password) {
