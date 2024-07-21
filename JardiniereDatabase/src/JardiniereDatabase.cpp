@@ -1,52 +1,49 @@
 #include "JardiniereDatabase.h"
 
-JardiniereDatabase::JardiniereDatabase(const char* deviceName)
-  : device_name(deviceName),display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET), signupOK(false), timeClient(ntpUDP) {}
+JardiniereDatabase::JardiniereDatabase(const String& deviceName)
+  : deviceName(deviceName), databaseIsConnect(false), timeClient(ntpUDP),ledManager(D6, D7, D8) {}
 
 void JardiniereDatabase::begin() {
-    display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDRESS);
     timeClient.begin();
 }
 
+void JardiniereDatabase::connectDatabase() {
+	config.api_key = api_key;
+	config.database_url = db_url;
+
+	if (Firebase.signUp(&config, &auth, "", "")) {
+		databaseIsConnect = true;
+	} else {
+		databaseIsConnect = false;
+	}
+
+	Firebase.begin(&config, &auth);
+}
+
 void JardiniereDatabase::loop() {
-    if (WiFi.status() != WL_CONNECTED) {
-        if (signupOK) {
-            signupOK = false;
-        }
-    } else if (!signupOK) {
-        resetDisplay();
-        config.api_key = api_key;
-        config.database_url = db_url;
 
-        if (Firebase.signUp(&config, &auth, "", "")) {
-            display.println("Successfuly connected to database.");
-            display.display();
-            signupOK = true;
-            delay(2000);
-            resetDisplay();
-        } else {
-            display.println("Failed to connect database.");
-            display.display();
-            signupOK = false;
-        }
 
-        Firebase.begin(&config, &auth);
+    if(WiFi.status() == WL_CONNECTED && !databaseIsConnect){
+    	connectDatabase();
     }
+    else if(WiFi.status() != WL_CONNECTED && databaseIsConnect){
+    	databaseIsConnect = false;
+    }
+
+	if(databaseIsConnect){
+   		ledManager.databaseIsConnected();
+	} else {
+		ledManager.failedToConnectToDatabase();
+	}
+
 }
 
-void JardiniereDatabase::resetDisplay() {
-    display.clearDisplay();
-    display.setTextSize(1);
-    display.setTextColor(WHITE);
-    display.setCursor(0, 0);
-    display.display();
-}
 
 void JardiniereDatabase::sendHumidityData(float humidity) {
-    String path = "/" + String(device_name) + "/humidity/data";
+    String path = "/" + String(deviceName) + "/humidity/data";
     String timestamp = getTimestamp();
     String fullPath = path + "/" + timestamp;
-    Firebase.RTDB.setString(&fbdo, fullPath, String(humidity, 1))
+    Firebase.RTDB.setString(&fbdo, fullPath, String(humidity, 1));
 }
 
 String JardiniereDatabase::getTimestamp() {

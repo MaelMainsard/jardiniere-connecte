@@ -1,38 +1,31 @@
 #include "JardiniereServer.h"
 
 JardiniereServer::JardiniereServer(const String& deviceName)
-    : deviceName(deviceName), display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET), webServer(80) {}
+    : deviceName(deviceName),ledManager(D6, D7, D8), webServer(80), onConnect(false) {}
 
-void JardiniereServer::begin() {
-    display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDRESS);
-    scanAvailableNetworks();
-    setupWebServerAndDNS();
-
-    String ssid, password;
-    if (readWiFiCredentials(ssid, password)) {
-        connectToWiFi(ssid, password);
-    } else {
-		resetDisplay();
-        display.println("Connect to this WiFi to configure the device.");
-        display.display();
-    }
-}
 
 void JardiniereServer::loop() {
     dnsServer.processNextRequest();
     webServer.handleClient();
-}
 
-void JardiniereServer::resetDisplay() {
-    display.clearDisplay();
-    display.setTextSize(1);
-    display.setTextColor(WHITE);
-    display.setCursor(0, 0);
-    display.display();
+    if(WiFi.status() != WL_CONNECTED && !onConnect){
+        ledManager.notConnectedToWifi();
+
+        scanAvailableNetworks();
+        setupWebServerAndDNS();
+
+        String ssid, password;
+        if (readWiFiCredentials(ssid, password)) {
+            connectToWiFi(ssid, password);
+        }
+
+    }
+    else {
+        ledManager.isConnectedAndHaveInternet();
+    }
 }
 
 void JardiniereServer::setupWebServerAndDNS() {
-    resetDisplay();
     WiFi.softAP(deviceName);
     dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
 
@@ -52,39 +45,26 @@ void JardiniereServer::scanAvailableNetworks() {
 }
 
 void JardiniereServer::connectToWiFi(const String& ssid, const String& password) {
-    resetDisplay();
-    display.println("Connecting to WiFi");
-    display.display();
+    onConnect = true;
+    ledManager.tryingToConnectToWifi();
 
     WiFi.begin(ssid.c_str(), password.c_str());
     int attempt = 0;
 
     while (WiFi.status() != WL_CONNECTED && attempt < 30) {
         delay(500);
-        display.print(".");
-        display.display();
         attempt++;
     }
 
-    resetDisplay();
     if (WiFi.status() == WL_CONNECTED) {
-        display.println("Connected to WiFi: " + WiFi.SSID());
-        display.display();
         saveWiFiCredentials(ssid, password);
         webServer.sendHeader("Location", "/disconnect");
         webServer.send(302, "text/plain", "");
-		delay(3000);
-		resetDisplay();
     } else {
-        display.println("Failed to connect to WiFi.");
-        display.display();
-        delay(3000);
-        resetDisplay();
-        display.println("Connect to this WiFi to configure the device.");
-        display.display();
         webServer.sendHeader("Location", "/");
         webServer.send(302, "text/plain", "");
     }
+    onConnect = false;
 }
 
 void JardiniereServer::saveWiFiCredentials(const String& ssid, const String& password) {
@@ -156,15 +136,8 @@ void JardiniereServer::handleFormSubmission() {
 void JardiniereServer::handleDisconnect() {
     if (WiFi.status() == WL_CONNECTED) {
         WiFi.disconnect();
-		resetDisplay();
-        display.println("WiFi Disconnect.");
-        display.display();
         webServer.sendHeader("Location", "/");
         webServer.send(302, "text/plain", "");
-		delay(3000);
- 		resetDisplay();
-        display.println("Connect to this WiFi to configure the device.");
-        display.display();
         clearWiFiCredentials();
     }
 }
@@ -182,30 +155,26 @@ void JardiniereServer::handleDisconnectPage() {
     webServer.send(200, "text/html", generateDisconnectPageHTML());
 }
 
-bool JardiniereServer::isConnectedToInternet() {
-    return WiFi.status() == WL_CONNECTED;
-}
-
 String JardiniereServer::generateMainPageHTML() {
     String html = "<!DOCTYPE html>"
-                  "<html>"
-                  "<head><title>ESP8266 Configuration</title>"
-                  "<style>"
-                  "body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f0f0; }"
-                  ".form-container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }"
-                  ".form-group { margin-bottom: 15px; }"
-                  "label { display: block; margin-bottom: 5px; }"
-                  "input[type=\"text\"], input[type=\"password\"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }"
-                  "button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }"
-                  "button:hover { background-color: #0056b3; }"
-                  "</style>"
-                  "</head>"
-                  "<body>"
-                  "<div class=\"form-container\">"
-                  "<form action=\"/submit\" method=\"post\">"
-                  "<div class=\"form-group\">"
-                  "<label for=\"ssid\">SSID :</label>"
-                  "<select id=\"ssid\" name=\"ssid\" required>";
+                 "<html>"
+                 "<head><title>ESP8266 Configuration</title>"
+                 "<style>"
+                 "body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f0f0; }"
+                 ".form-container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }"
+                 ".form-group { margin-bottom: 15px; }"
+                 "label { display: block; margin-bottom: 5px; }"
+                 "input[type=\"text\"], input[type=\"password\"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }"
+                 "button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }"
+                 "button:hover { background-color: #0056b3; }"
+                 "</style>"
+                 "</head>"
+                 "<body>"
+                 "<div class=\"form-container\">"
+                 "<form action=\"/submit\" method=\"post\">"
+                 "<div class=\"form-group\">"
+                 "<label for=\"ssid\">SSID:</label>"
+                 "<select id=\"ssid\" name=\"ssid\" required>";
 
     if (networkCount > 0) {
         for (int i = 0; i < networkCount && i < MAX_NETWORKS; ++i) {
@@ -218,7 +187,7 @@ String JardiniereServer::generateMainPageHTML() {
     html += "</select>"
             "</div>"
             "<div class=\"form-group\">"
-            "<label for=\"password\">Password :</label>"
+            "<label for=\"password\">Password:</label>"
             "<input type=\"password\" id=\"password\" name=\"password\" required>"
             "</div>"
             "<button type=\"submit\">Submit</button>"

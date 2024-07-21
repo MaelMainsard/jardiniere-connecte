@@ -1,18 +1,19 @@
-JardiniereServer   KEYWORD2
-begin              KEYWORD2
-loop               KEYWORD2
-resetDisplay  KEYWORD2
-setupWebServerAndDNS  KEYWORD2
-scanAvailableNetworks  KEYWORD2
-connectToWiFi      KEYWORD2
-saveWiFiCredentials  KEYWORD2
-readWiFiCredentials  KEYWORD2
-clearWiFiCredentials  KEYWORD2
-handleRootRequest  KEYWORD2
-handleFormSubmission  KEYWORD2
-handleDisconnect   KEYWORD2
-handleNotFound     KEYWORD2
-handleDisconnectPage  KEYWORD2
-generateMainPageHTML  KEYWORD2
-generateDisconnectPageHTML  KEYWORD2
-isConnectedToInternet KEYWORD2
+JardiniereServer	KEYWORD1
+loop	KEYWORD2
+isInternetAvailable	KEYWORD2
+
+setupWebServerAndDNS	KEYWORD2
+scanAvailableNetworks	KEYWORD2
+connectToWiFi	KEYWORD2
+saveWiFiCredentials	KEYWORD2
+readWiFiCredentials	KEYWORD2
+clearWiFiCredentials	KEYWORD2
+
+handleRootRequest	KEYWORD2
+handleFormSubmission	KEYWORD2
+handleDisconnect	KEYWORD2
+handleNotFound	KEYWORD2
+handleDisconnectPage	KEYWORD2
+
+generateMainPageHTML	KEYWORD2
+generateDisconnectPageHTML	KEYWORD2
