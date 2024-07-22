@@ -5,12 +5,11 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
-#include <EEPROM.h>
 #include <LedManager.h>
+#include <EEPROMManager.h>
 
 #define DNS_PORT 53
 #define MAX_NETWORKS 20
-#define EEPROM_SIZE 512
 
 class JardiniereServer {
 public:
@@ -30,14 +29,12 @@ private:
     ESP8266WebServer webServer;
     DNSServer dnsServer;
 	LedManager ledManager;
+    EEPROMManager eepromManager;
 
     void setupWebServerAndDNS();
     void scanAvailableNetworks();
 	void scanAndReconnect();
     void connectToWiFi(const String& ssid, const String& password);
-    void saveWiFiCredentials(const String& ssid, const String& password);
-    bool readWiFiCredentials(String& ssid, String& password);
-    void clearWiFiCredentials();
 
     void handleRootRequest();
     void handleFormSubmission();

@@ -7,6 +7,7 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 #include <DisplayManager.h>
+#include <EEPROMManager.h>
 
 class JardiniereDatabase {
 public:
@@ -27,9 +28,16 @@ private:
     WiFiUDP ntpUDP;
     NTPClient timeClient;
     DisplayManager display;
+    EEPROMManager eepromManager;
 
     String getTimestamp();
 	void connectDatabase();
+	void getDbTemp();
+	void getDbLum();
+	void getDbHum();
+	void getDbInt();
+	void getAllDataDromDb();
+	float truncateToOneDecimal(float number);
 };
 
 #endif
