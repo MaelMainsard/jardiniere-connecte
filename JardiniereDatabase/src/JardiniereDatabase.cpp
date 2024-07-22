@@ -1,10 +1,10 @@
 #include "JardiniereDatabase.h"
 
 JardiniereDatabase::JardiniereDatabase(const String& deviceName)
-  : deviceName(deviceName), databaseIsConnect(false), timeClient(ntpUDP), display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET) {}
+  : deviceName(deviceName), databaseIsConnect(false), timeClient(ntpUDP), display() {}
 
 void JardiniereDatabase::begin() {
-	display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDRESS);
+	display.init();
     timeClient.begin();
 }
 
@@ -23,7 +23,6 @@ void JardiniereDatabase::connectDatabase() {
 
 void JardiniereDatabase::loop() {
 
-
     if(WiFi.status() == WL_CONNECTED && !databaseIsConnect){
     	connectDatabase();
     }
@@ -31,24 +30,11 @@ void JardiniereDatabase::loop() {
     	databaseIsConnect = false;
     }
 
-	clearDisplay();
-
 	if(databaseIsConnect){
-		display.println("Connected to Database");
-		display.display();
+		display.displayDbConnected();
 	} else {
-		display.println("Disconnected from Database");
-		display.display();
+		display.displayDbDisconnected();
 	}
-
-}
-
-void JardiniereDatabase::clearDisplay() {
-	display.clearDisplay();
-	display.setTextSize(1);
-	display.setTextColor(WHITE);
-	display.setCursor(0, 0);
-	display.display();
 }
 
 

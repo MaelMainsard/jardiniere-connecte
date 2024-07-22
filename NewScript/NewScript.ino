@@ -7,8 +7,8 @@ JardiniereServer jardinierServer(DEVICE_NAME);
 JardiniereDatabase jardinierDatabase(DEVICE_NAME);
 
 void setup() {
-    jardinierServer.begin();
     jardinierDatabase.begin();
+    jardinierServer.begin();
 }
 
 void loop() {
