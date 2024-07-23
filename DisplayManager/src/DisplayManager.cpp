@@ -32,65 +32,82 @@ void DisplayManager::displayDbDisconnected(){
    display.print("Disconnected");
    display.display();
 }
-
-void DisplayManager::displayTemp(float value){
-  display.fillRect(0, 15, SCREEN_WIDTH / 2, 16, SSD1306_BLACK);
+// X Y
+//-------------------------------------
+// 0 0
+//-------------------------------------
+void DisplayManager::displayAirHum(String value){
+  display.fillRect(0, 15, (SCREEN_WIDTH / 2)-1, 12, SSD1306_BLACK);
   display.setTextColor(SSD1306_WHITE);
   display.setTextSize(1);
-  display.setCursor(5, 21);
-  display.print(String(value,1)+" C");
+  display.setCursor(5, 18);
+  display.print(value+"%");
+  display.setCursor((SCREEN_WIDTH / 2)-10, 18);
+  display.print("A");
   display.display();
 }
-
-void DisplayManager::displayDbTemp(String value){
+//-------------------------------------
+// 0 1
+//-------------------------------------
+void DisplayManager::displayGndHum(String value){
+  display.fillRect(0, 27, (SCREEN_WIDTH / 2)-1, 12, SSD1306_BLACK);
+  display.setTextColor(SSD1306_WHITE);
+  display.setTextSize(1);
+  display.setCursor(5, 30);
+  display.print(value+"%");
+  display.setCursor((SCREEN_WIDTH / 2)-10, 30);
+  display.print("G");
+  display.display();
+}
+//-------------------------------------
+// 0 2
+//-------------------------------------
+void DisplayManager::displayTemp(String value){
+  display.fillRect(0, 39, (SCREEN_WIDTH / 2)-1, 12, SSD1306_BLACK);
+  display.setTextColor(SSD1306_WHITE);
+  display.setTextSize(1);
+  display.setCursor(5, 42);
+  display.print(value+"C");
+  display.setCursor((SCREEN_WIDTH / 2)-10, 42);
+  display.print("T");
+  display.display();
+}
+//--------------------------------------
+// 0 3
+//--------------------------------------
+void DisplayManager::displayLum(String value){
+  display.fillRect(0, 51, (SCREEN_WIDTH / 2)-1, 12, SSD1306_BLACK);
+  display.setTextColor(SSD1306_WHITE);
+  display.setTextSize(1);
+  display.setCursor(5, 54);
+  display.print(value+"lm");
+  display.setCursor((SCREEN_WIDTH / 2)-10, 54);
+  display.print("L");
+  display.display();
+}
+//--------------------------------------
+// 1 0
+//--------------------------------------
+void DisplayManager::displayIntUpd(String value){
   display.fillRect((SCREEN_WIDTH / 2)+1, 15, SCREEN_WIDTH / 2, 12, SSD1306_BLACK);
   display.setTextColor(SSD1306_WHITE);
   display.setTextSize(1);
-  display.setCursor((SCREEN_WIDTH / 2) + 6,18);
-  display.print(value+" C");
+  display.setCursor((SCREEN_WIDTH / 2)+6, 18);
+  display.print(value);
+  display.setCursor(SCREEN_WIDTH - 10, 18);
+  display.print("R");
   display.display();
 }
-
-void DisplayManager::displayHum(float value){
-  display.fillRect((SCREEN_WIDTH / 2)+1, 31, SCREEN_WIDTH / 2, 16, SSD1306_BLACK);
-  display.setTextColor(SSD1306_WHITE);
-  display.setTextSize(1);
-  display.setCursor(5, 36);
-  display.print(String(value,1)+"%");
-  display.display();
-}
-
-void DisplayManager::displayDbHum(String value){
+//--------------------------------------
+// 1 1
+//--------------------------------------
+void DisplayManager::displayIntSend(String value){
   display.fillRect((SCREEN_WIDTH / 2)+1, 27, SCREEN_WIDTH / 2, 12, SSD1306_BLACK);
   display.setTextColor(SSD1306_WHITE);
   display.setTextSize(1);
-  display.setCursor((SCREEN_WIDTH / 2) + 6,30);
-  display.print(value+"%");
-  display.display();
-}
-
-void DisplayManager::displayLum(float value){
-  display.fillRect(0, 45, SCREEN_WIDTH / 2, 16, SSD1306_BLACK);
-  display.setTextColor(SSD1306_WHITE);
-  display.setTextSize(1);
-  display.setCursor(5, 51);
-  display.print(String(value,1)+" lm");
-  display.display();
-}
-
-void DisplayManager::displayDbLum(String value){
-  display.fillRect((SCREEN_WIDTH / 2)+1, 39, SCREEN_WIDTH / 2, 12, SSD1306_BLACK);
-  display.setTextColor(SSD1306_WHITE);
-  display.setTextSize(1);
-  display.setCursor((SCREEN_WIDTH / 2) + 6, 42);
-  display.print(value+" lm");
-  display.display();
-}
-void DisplayManager::displayDbInter(String value){
-  display.fillRect((SCREEN_WIDTH / 2)+1, 51, SCREEN_WIDTH / 2, 12, SSD1306_BLACK);
-  display.setTextColor(SSD1306_WHITE);
-  display.setTextSize(1);
-  display.setCursor((SCREEN_WIDTH / 2) + 6, 54);
-  display.print(value+"s");
+  display.setCursor((SCREEN_WIDTH / 2)+6, 30);
+  display.print(value);
+  display.setCursor(SCREEN_WIDTH - 10, 30);
+  display.print("S");
   display.display();
 }

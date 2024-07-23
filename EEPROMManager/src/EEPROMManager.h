@@ -5,29 +5,51 @@
 #include <EEPROM.h>
 
 #define EEPROM_SIZE 512
+#define AIR_HUM_ADRESS 0
+#define GND_HUM_ADRESS 50
+#define TEMP_ADRESS 100
+#define LUM_ADRESS 150
+#define UPD_INT_ADRESS 200
+#define SND_INT_ADRESS 250
+#define SSID_ADRESS 300
+#define PSW_ADRESS 350
+
 
 class EEPROMManager {
 public:
     EEPROMManager();
-    void saveWiFiCredentials(const String& ssid, const String& password);
-    bool readWiFiCredentials(String& ssid, String& password);
-    void clearWiFiCredentials();
+    void saveEepromSsid(String ssid);
+    bool readEepromSsid(String& ssid);
+    void clearEepromSsid();
 
-    void saveEepromTemp(const float value);
+    void saveEepromPsw(String psw);
+    bool readEepromPsw(String& psw);
+    void clearEepromPsw();
+
+    void saveEepromAirHum(float value);
+    bool readEepromAirHum(float& value);
+    void clearEepromAirHum();
+
+    void saveEepromGndHum(float value);
+    bool readEepromGndHum(float& value);
+    void clearEepromGndHum();
+
+    void saveEepromTemp(float value);
     bool readEepromTemp(float& value);
     void clearEepromTemp();
 
-    void saveEepromLum(const float value);
+    void saveEepromLum(float value);
     bool readEepromLum(float& value);
     void clearEepromLum();
 
-    void saveEepromHum(const float value);
-    bool readEepromHum(float& value);
-    void clearEepromHum();
+    void saveEepromUpdInt(float value);
+    bool readEepromUpdInt(float& value);
+    void clearEepromUpdInt();
 
-    void saveEepromInt(const float value);
-    bool readEepromInt(float& value);
-    void clearEepromInt();
+    void saveEepromSndInt(float value);
+    bool readEepromSndInt(float& value);
+    void clearEepromSndInt();
+
 
 private:
 

@@ -18,13 +18,12 @@ public:
     void init();
     void displayDbConnected();
     void displayDbDisconnected();
-    void displayTemp(float value);
-    void displayDbTemp(String value);
-    void displayHum(float value);
-    void displayDbHum(String value);
-    void displayLum(float value);
-    void displayDbLum(String value);
-    void displayDbInter(String value);
+    void displayAirHum(String value);
+    void displayGndHum(String value);
+    void displayTemp(String value);
+    void displayLum(String value);
+    void displayIntUpd(String value);
+    void displayIntSend(String value);
 
 private:
     Adafruit_SSD1306 display;
