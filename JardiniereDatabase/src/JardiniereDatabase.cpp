@@ -49,142 +49,45 @@ void JardiniereDatabase::sendHumidityData(float humidity) {
 }
 
 void JardiniereDatabase::getAllDataDromDb(){
-	getDbTemp();
-	getDbLum();
-	getDbHum();
-	getDbInt();
+	getDbAirHum();
 }
 
 float JardiniereDatabase::truncateToOneDecimal(float number) {
 	return int(number * 10) / 10.0;
 }
 
-void JardiniereDatabase::getDbTemp(){
+void JardiniereDatabase::getDbAirHum(){
 
-	bool hasDbTemperature = false;
-	float dbTemperature;
+	bool hasDbAirHum = false;
+	float dbAirHum;
 
 	if (Firebase.ready() && databaseIsConnect) {
-		String path = "/" + String(deviceName) + "/temperature/degre";
+		String path = "/" + String(deviceName) + "/air-humidity/percentage";
 		if (Firebase.RTDB.getFloat(&fbdo, path)) {
-			dbTemperature = fbdo.floatData();
-			hasDbTemperature = true;
+			dbAirHum = fbdo.floatData();
+			hasDbAirHum = true;
 		}
 	}
 
-	float eepromTemperature;
-	bool eepromExists = eepromManager.readEepromTemp(eepromTemperature);
+	float eepromAirHum;
+	bool eepromExists = eepromManager.readEepromAirHum(eepromAirHum);
 
-	if (hasDbTemperature) {
-		display.displayDbTemp(String(dbTemperature,1));
+	if (hasDbAirHum) {
+		display.displayAirHum(String(dbAirHum,1));
 		if (eepromExists) {
-			if (dbTemperature != eepromTemperature) {
-				eepromManager.clearEepromTemp();
-				eepromManager.saveEepromTemp(dbTemperature);
+			if (dbAirHum != eepromAirHum) {
+				eepromManager.saveEepromAirHum(dbAirHum);
 			}
 		} else {
-			eepromManager.saveEepromTemp(dbTemperature);
+			eepromManager.saveEepromAirHum(dbAirHum);
 		}
 	} else {
-		display.displayDbTemp(eepromExists ? String(eepromTemperature,1) : "?");
+		display.displayAirHum(eepromExists ? String(eepromAirHum,1) : "?");
 	}
 
 }
 
-void JardiniereDatabase::getDbLum(){
 
-	bool hasDbLuminisity = false;
-	float dbLuminisity;
-
-	if (Firebase.ready() && databaseIsConnect) {
-		String path = "/" + String(deviceName) + "/luminosity/lumen";
-		if (Firebase.RTDB.getFloat(&fbdo, path)) {
-			dbLuminisity = fbdo.floatData();
-			hasDbLuminisity = true;
-		}
-	}
-
-	float eepromLuminosity;
-	bool eepromExists = eepromManager.readEepromLum(eepromLuminosity);
-
-	if (hasDbLuminisity) {
-		display.displayDbLum(String(dbLuminisity,1));
-		if (eepromExists) {
-			if (dbLuminisity != eepromLuminosity) {
-				eepromManager.clearEepromLum();
-				eepromManager.saveEepromLum(dbLuminisity);
-			}
-		} else {
-			eepromManager.saveEepromLum(dbLuminisity);
-		}
-	} else {
-		display.displayDbLum(eepromExists ? String(eepromLuminosity,1) : "?");
-	}
-}
-
-void JardiniereDatabase::getDbHum(){
-
-	bool hasDbHumidity = false;
-	float dbHumidity;
-
-	if (Firebase.ready() && databaseIsConnect) {
-		String path = "/" + String(deviceName) + "/humidity/percentage";
-		if (Firebase.RTDB.getFloat(&fbdo, path)) {
-			dbHumidity = fbdo.floatData();
-			hasDbHumidity = true;
-		}
-	}
-
-	float eepromHumidity;
-	bool eepromExists = eepromManager.readEepromHum(eepromHumidity);
-
-	if (hasDbHumidity) {
-		display.displayDbHum(String(dbHumidity,1));
-		if (eepromExists) {
-			if (dbHumidity != eepromHumidity) {
-				eepromManager.clearEepromHum();
-				eepromManager.saveEepromHum(dbHumidity);
-			}
-		} else {
-			eepromManager.saveEepromHum(dbHumidity);
-		}
-	} else {
-		display.displayDbHum(eepromExists ? String(eepromHumidity,1) : "?");
-	}
-
-}
-
-void JardiniereDatabase::getDbInt(){
-
-	bool hasDbIntervale = false;
-	float dbIntervale;
-
-	if (Firebase.ready() && databaseIsConnect) {
-		String path = "/" + String(deviceName) + "/interval_s";
-		if (Firebase.RTDB.getFloat(&fbdo, path)) {
-			dbIntervale = fbdo.floatData();
-			hasDbIntervale = true;
-		}
-	}
-
-	float eepromIntervale;
-	bool eepromExists = eepromManager.readEepromInt(eepromIntervale);
-
-	if (hasDbIntervale) {
-		display.displayDbInter(String(dbIntervale,1));
-		if (eepromExists) {
-			if (dbIntervale != eepromIntervale) {
-				eepromManager.clearEepromInt();
-				eepromManager.saveEepromInt(dbIntervale);
-			}
-		} else {
-			eepromManager.saveEepromInt(dbIntervale);
-		}
-	} else {
-		display.displayDbInter(eepromExists ? String(eepromIntervale,1) : "?");
-	}
-
-}
 
 String JardiniereDatabase::getTimestamp() {
     timeClient.update();

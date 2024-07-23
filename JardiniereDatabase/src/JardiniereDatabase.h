@@ -32,10 +32,9 @@ private:
 
     String getTimestamp();
 	void connectDatabase();
-	void getDbTemp();
-	void getDbLum();
-	void getDbHum();
-	void getDbInt();
+
+	void getDbAirHum();
+
 	void getAllDataDromDb();
 	float truncateToOneDecimal(float number);
 };
