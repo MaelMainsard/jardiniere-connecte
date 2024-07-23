@@ -50,6 +50,11 @@ void JardiniereDatabase::sendHumidityData(float humidity) {
 
 void JardiniereDatabase::getAllDataDromDb(){
 	getDbAirHum();
+	getDbGndHum();
+	getDbTemp();
+	getDbLum();
+	getDbIntUpd();
+	getDbIntSend();
 }
 
 float JardiniereDatabase::truncateToOneDecimal(float number) {
@@ -58,37 +63,201 @@ float JardiniereDatabase::truncateToOneDecimal(float number) {
 
 void JardiniereDatabase::getDbAirHum(){
 
-	bool hasDbAirHum = false;
-	float dbAirHum;
+	bool hasDb = false;
+	float db;
 
 	if (Firebase.ready() && databaseIsConnect) {
 		String path = "/" + String(deviceName) + "/air-humidity/percentage";
 		if (Firebase.RTDB.getFloat(&fbdo, path)) {
-			dbAirHum = fbdo.floatData();
-			hasDbAirHum = true;
+			db = fbdo.floatData();
+			hasDb = true;
 		}
 	}
 
 
-	float eepromAirHum;
-	bool eepromExists = eepromManager.readEepromAirHum(eepromAirHum);
+	float eeprom;
+	bool eepromExists = eepromManager.readEepromAirHum(eeprom);
 
-	if (hasDbAirHum) {
-		display.displayAirHum(String(dbAirHum,1));
+	if (hasDb) {
+		display.displayAirHum(String(db,1));
 		if (eepromExists) {
-			if (dbAirHum != eepromAirHum) {
-				eepromManager.saveEepromAirHum(dbAirHum);
+			if (db != eeprom) {
+				eepromManager.clearEepromAirHum();
+				eepromManager.saveEepromAirHum(db);
 			}
 		} else {
-			eepromManager.saveEepromAirHum(dbAirHum);
+			eepromManager.saveEepromAirHum(db);
 		}
 	} else {
-		display.displayAirHum(eepromExists ? String(eepromAirHum,1) : "?");
+		display.displayAirHum(eepromExists ? String(eeprom,1) : "?");
 	}
-
 
 }
 
+void JardiniereDatabase::getDbGndHum(){
+
+	bool hasDb = false;
+	float db;
+
+	if (Firebase.ready() && databaseIsConnect) {
+		String path = "/" + String(deviceName) + "/ground-humidity/percentage";
+		if (Firebase.RTDB.getFloat(&fbdo, path)) {
+			db = fbdo.floatData();
+			hasDb = true;
+		}
+	}
+
+
+	float eeprom;
+	bool eepromExists = eepromManager.readEepromGndHum(eeprom);
+
+	if (hasDb) {
+		display.displayGndHum(String(db,1));
+		if (eepromExists) {
+			if (db != eeprom) {
+				eepromManager.clearEepromGndHum();
+				eepromManager.saveEepromGndHum(db);
+			}
+		} else {
+			eepromManager.saveEepromGndHum(db);
+		}
+	} else {
+		display.displayGndHum(eepromExists ? String(eeprom,1) : "?");
+	}
+
+}
+
+void JardiniereDatabase::getDbTemp(){
+
+	bool hasDb = false;
+	float db;
+
+	if (Firebase.ready() && databaseIsConnect) {
+		String path = "/" + String(deviceName) + "/temperature/degre";
+		if (Firebase.RTDB.getFloat(&fbdo, path)) {
+			db = fbdo.floatData();
+			hasDb = true;
+		}
+	}
+
+
+	float eeprom;
+	bool eepromExists = eepromManager.readEepromTemp(eeprom);
+
+	if (hasDb) {
+		display.displayTemp(String(db,1));
+		if (eepromExists) {
+			if (db != eeprom) {
+				eepromManager.clearEepromTemp();
+				eepromManager.saveEepromTemp(db);
+			}
+		} else {
+			eepromManager.saveEepromTemp(db);
+		}
+	} else {
+		display.displayTemp(eepromExists ? String(eeprom,1) : "?");
+	}
+
+}
+
+void JardiniereDatabase::getDbLum(){
+
+	bool hasDb = false;
+	float db;
+
+	if (Firebase.ready() && databaseIsConnect) {
+		String path = "/" + String(deviceName) + "/luminosity/lumen";
+		if (Firebase.RTDB.getFloat(&fbdo, path)) {
+			db = fbdo.floatData();
+			hasDb = true;
+		}
+	}
+
+
+	float eeprom;
+	bool eepromExists = eepromManager.readEepromLum(eeprom);
+
+	if (hasDb) {
+		display.displayLum(String(db,1));
+		if (eepromExists) {
+			if (db != eeprom) {
+				eepromManager.clearEepromLum();
+				eepromManager.saveEepromLum(db);
+			}
+		} else {
+			eepromManager.saveEepromLum(db);
+		}
+	} else {
+		display.displayLum(eepromExists ? String(eeprom,1) : "?");
+	}
+
+}
+
+void JardiniereDatabase::getDbIntUpd(){
+
+	bool hasDb = false;
+	float db;
+
+	if (Firebase.ready() && databaseIsConnect) {
+		String path = "/" + String(deviceName) + "/interval/update_s";
+		if (Firebase.RTDB.getFloat(&fbdo, path)) {
+			db = fbdo.floatData();
+			hasDb = true;
+		}
+	}
+
+
+	float eeprom;
+	bool eepromExists = eepromManager.readEepromUpdInt(eeprom);
+
+	if (hasDb) {
+		display.displayIntUpd(String(db,1));
+		if (eepromExists) {
+			if (db != eeprom) {
+				eepromManager.clearEepromUpdInt();
+				eepromManager.saveEepromUpdInt(db);
+			}
+		} else {
+			eepromManager.saveEepromUpdInt(db);
+		}
+	} else {
+		display.displayIntUpd(eepromExists ? String(eeprom,1) : "?");
+	}
+
+}
+
+void JardiniereDatabase::getDbIntSend(){
+
+	bool hasDb = false;
+	float db;
+
+	if (Firebase.ready() && databaseIsConnect) {
+		String path = "/" + String(deviceName) + "/interval/sending_s";
+		if (Firebase.RTDB.getFloat(&fbdo, path)) {
+			db = fbdo.floatData();
+			hasDb = true;
+		}
+	}
+
+
+	float eeprom;
+	bool eepromExists = eepromManager.readEepromSndInt(eeprom);
+
+	if (hasDb) {
+		display.displayIntSend(String(db,1));
+		if (eepromExists) {
+			if (db != eeprom) {
+				eepromManager.clearEepromSndInt();
+				eepromManager.saveEepromSndInt(db);
+			}
+		} else {
+			eepromManager.saveEepromSndInt(db);
+		}
+	} else {
+		display.displayIntSend(eepromExists ? String(eeprom,1) : "?");
+	}
+
+}
 
 
 String JardiniereDatabase::getTimestamp() {

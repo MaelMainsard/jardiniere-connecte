@@ -34,6 +34,11 @@ private:
 	void connectDatabase();
 
 	void getDbAirHum();
+	void getDbGndHum();
+	void getDbTemp();
+	void getDbLum();
+	void getDbIntUpd();
+	void getDbIntSend();
 
 	void getAllDataDromDb();
 	float truncateToOneDecimal(float number);
