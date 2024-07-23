@@ -7,13 +7,12 @@ EEPROMManager::EEPROMManager() {}
 //----------------------------------------------------
 
 void EEPROMManager::saveEepromAirHum(float value) {
-    clearEepromAirHum();
     EEPROM.begin(EEPROM_SIZE);
 
-    byte* bytePointer = (byte*)(void*)&value;
+    String stringValue = String(value);
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        EEPROM.write(AIR_HUM_ADRESS + i, bytePointer[i]);
+    for (int i = 0; i < AIR_HUM_ADRESS[1]; ++i) {
+        EEPROM.write(AIR_HUM_ADRESS[0] + i, stringValue[i]);
     }
 
     EEPROM.commit();
@@ -21,25 +20,24 @@ void EEPROMManager::saveEepromAirHum(float value) {
 bool EEPROMManager::readEepromAirHum(float& value) {
     EEPROM.begin(EEPROM_SIZE);
 
-    byte* bytePointer = (byte*)(void*)&value;
-
-    for (int i = 0; i < sizeof(float); ++i) {
-        bytePointer[i] = EEPROM.read(AIR_HUM_ADRESS + i);
+    int address = AIR_HUM_ADRESS[0];
+    String storedValue = "";
+    char ch;
+    while ((ch = EEPROM.read(address++)) != 0) {
+        storedValue += ch;
     }
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        if (bytePointer[i] == 0xFF || bytePointer[i] != 0) {
-            return false;
-        }
+    if (storedValue.length() > 0) {
+        value = storedValue.toFloat();
+        return true;
     }
-
-    return true;
+    return false;
 }
 void EEPROMManager::clearEepromAirHum() {
     EEPROM.begin(EEPROM_SIZE);
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        EEPROM.write(AIR_HUM_ADRESS + i, 0);
+    for (int i = 0; i < AIR_HUM_ADRESS[1] ; ++i) {
+        EEPROM.write(AIR_HUM_ADRESS[0] + i, 0);
     }
 
     EEPROM.commit();
@@ -55,22 +53,22 @@ void EEPROMManager::saveEepromGndHum(float value) {
 
     byte* bytePointer = (byte*)(void*)&value;
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        EEPROM.write(GND_HUM_ADRESS + i, bytePointer[i]);
+    for (int i = 0; i < GND_HUM_ADRESS[1]; ++i) {
+        EEPROM.write(GND_HUM_ADRESS[0] + i, bytePointer[i]);
     }
 
     EEPROM.commit();
 }
-void EEPROMManager::readEepromGndHum(float& value) {
+bool EEPROMManager::readEepromGndHum(float& value) {
     EEPROM.begin(EEPROM_SIZE);
 
     byte* bytePointer = (byte*)(void*)&value;
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        bytePointer[i] = EEPROM.read(GND_HUM_ADRESS + i);
+    for (int i = 0; i < GND_HUM_ADRESS[1]; ++i) {
+        bytePointer[i] = EEPROM.read(GND_HUM_ADRESS[0] + i);
     }
 
-    for (int i = 0; i < sizeof(float); ++i) {
+    for (int i = 0; i < GND_HUM_ADRESS[1]; ++i) {
         if (bytePointer[i] == 0xFF || bytePointer[i] != 0) {
             return false;
         }
@@ -81,8 +79,8 @@ void EEPROMManager::readEepromGndHum(float& value) {
 void EEPROMManager::clearEepromGndHum() {
     EEPROM.begin(EEPROM_SIZE);
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        EEPROM.write(GND_HUM_ADRESS + i, 0);
+    for (int i = 0; i < GND_HUM_ADRESS[1]; ++i) {
+        EEPROM.write(GND_HUM_ADRESS[0] + i, 0);
     }
 
     EEPROM.commit();
@@ -98,8 +96,8 @@ void EEPROMManager::saveEepromTemp(float value) {
 
     byte* bytePointer = (byte*)(void*)&value;
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        EEPROM.write(TEMP_ADRESS + i, bytePointer[i]);
+    for (int i = 0; i < TEMP_ADRESS[1]; ++i) {
+        EEPROM.write(TEMP_ADRESS[0] + i, bytePointer[i]);
     }
 
     EEPROM.commit();
@@ -109,11 +107,11 @@ bool EEPROMManager::readEepromTemp(float& value) {
 
     byte* bytePointer = (byte*)(void*)&value;
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        bytePointer[i] = EEPROM.read(TEMP_ADRESS + i);
+    for (int i = 0; i < TEMP_ADRESS[1]; ++i) {
+        bytePointer[i] = EEPROM.read(TEMP_ADRESS[0] + i);
     }
 
-    for (int i = 0; i < sizeof(float); ++i) {
+    for (int i = 0; i < TEMP_ADRESS[1]; ++i) {
         if (bytePointer[i] == 0xFF || bytePointer[i] != 0) {
             return false;
         }
@@ -124,8 +122,8 @@ bool EEPROMManager::readEepromTemp(float& value) {
 void EEPROMManager::clearEepromTemp() {
     EEPROM.begin(EEPROM_SIZE);
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        EEPROM.write(TEMP_ADRESS + i, 0);
+    for (int i = 0; i < TEMP_ADRESS[1]; ++i) {
+        EEPROM.write(TEMP_ADRESS[0] + i, 0);
     }
 
     EEPROM.commit();
@@ -141,8 +139,8 @@ void EEPROMManager::saveEepromLum(float value) {
 
     byte* bytePointer = (byte*)(void*)&value;
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        EEPROM.write(LUM_ADRESS + i, bytePointer[i]);
+    for (int i = 0; i < LUM_ADRESS[1]; ++i) {
+        EEPROM.write(LUM_ADRESS[0] + i, bytePointer[i]);
     }
 
     EEPROM.commit();
@@ -152,11 +150,11 @@ bool EEPROMManager::readEepromLum(float& value) {
 
     byte* bytePointer = (byte*)(void*)&value;
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        bytePointer[i] = EEPROM.read(LUM_ADRESS + i);
+    for (int i = 0; i < LUM_ADRESS[1]; ++i) {
+        bytePointer[i] = EEPROM.read(LUM_ADRESS[0] + i);
     }
 
-    for (int i = 0; i < sizeof(float); ++i) {
+    for (int i = 0; i < LUM_ADRESS[1]; ++i) {
         if (bytePointer[i] == 0xFF || bytePointer[i] != 0) {
             return false;
         }
@@ -167,8 +165,8 @@ bool EEPROMManager::readEepromLum(float& value) {
 void EEPROMManager::clearEepromLum() {
     EEPROM.begin(EEPROM_SIZE);
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        EEPROM.write(LUM_ADRESS + i, 0);
+    for (int i = 0; i < LUM_ADRESS[1]; ++i) {
+        EEPROM.write(LUM_ADRESS[0] + i, 0);
     }
 
     EEPROM.commit();
@@ -184,8 +182,8 @@ void EEPROMManager::saveEepromUpdInt(float value) {
 
     byte* bytePointer = (byte*)(void*)&value;
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        EEPROM.write(UPD_INT_ADRESS + i, bytePointer[i]);
+    for (int i = 0; i < UPD_INT_ADRESS[1]; ++i) {
+        EEPROM.write(UPD_INT_ADRESS[0] + i, bytePointer[i]);
     }
 
     EEPROM.commit();
@@ -195,11 +193,11 @@ bool EEPROMManager::readEepromUpdInt(float& value) {
 
     byte* bytePointer = (byte*)(void*)&value;
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        bytePointer[i] = EEPROM.read(UPD_INT_ADRESS + i);
+    for (int i = 0; i < UPD_INT_ADRESS[1]; ++i) {
+        bytePointer[i] = EEPROM.read(UPD_INT_ADRESS[0] + i);
     }
 
-    for (int i = 0; i < sizeof(float); ++i) {
+    for (int i = 0; i < UPD_INT_ADRESS[1]; ++i) {
         if (bytePointer[i] == 0xFF || bytePointer[i] != 0) {
             return false;
         }
@@ -210,8 +208,8 @@ bool EEPROMManager::readEepromUpdInt(float& value) {
 void EEPROMManager::clearEepromUpdInt() {
     EEPROM.begin(EEPROM_SIZE);
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        EEPROM.write(UPD_INT_ADRESS + i, 0);
+    for (int i = 0; i < UPD_INT_ADRESS[1]; ++i) {
+        EEPROM.write(UPD_INT_ADRESS[0] + i, 0);
     }
 
     EEPROM.commit();
@@ -227,8 +225,8 @@ void EEPROMManager::saveEepromSndInt(float value) {
 
     byte* bytePointer = (byte*)(void*)&value;
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        EEPROM.write(SND_INT_ADRESS + i, bytePointer[i]);
+    for (int i = 0; i < SND_INT_ADRESS[1]; ++i) {
+        EEPROM.write(SND_INT_ADRESS[0] + i, bytePointer[i]);
     }
 
     EEPROM.commit();
@@ -238,11 +236,11 @@ bool EEPROMManager::readEepromSndInt(float& value) {
 
     byte* bytePointer = (byte*)(void*)&value;
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        bytePointer[i] = EEPROM.read(SND_INT_ADRESS + i);
+    for (int i = 0; i < SND_INT_ADRESS[1]; ++i) {
+        bytePointer[i] = EEPROM.read(SND_INT_ADRESS[0] + i);
     }
 
-    for (int i = 0; i < sizeof(float); ++i) {
+    for (int i = 0; i < SND_INT_ADRESS[1]; ++i) {
         if (bytePointer[i] == 0xFF || bytePointer[i] != 0) {
             return false;
         }
@@ -253,112 +251,63 @@ bool EEPROMManager::readEepromSndInt(float& value) {
 void EEPROMManager::clearEepromSndInt() {
     EEPROM.begin(EEPROM_SIZE);
 
-    for (int i = 0; i < sizeof(float); ++i) {
-        EEPROM.write(SND_INT_ADRESS + i, 0);
+    for (int i = 0; i < SND_INT_ADRESS[1]; ++i) {
+        EEPROM.write(SND_INT_ADRESS[0] + i, 0);
     }
 
     EEPROM.commit();
 }
 
 //----------------------------------------------------
-// Save, read, clear ssid
+// Save, read, clear ssid & psw
 //----------------------------------------------------
 
-void EEPROMManager::saveEepromSsid(String ssid) {
-    clearEepromSsid();
+void EEPROMManager::saveWiFiCredentials(const String& ssid, const String& password) {
     EEPROM.begin(EEPROM_SIZE);
 
-    const char* charPointer = value.c_str();
-    int length = value.length();
-
-    for (int i = 0; i <= length; ++i) {
-        EEPROM.write(SSID_ADRESS + i, charPointer[i]);
+    int address = SSID_PSW_ADRESS[0];
+    for (size_t i = 0; i < ssid.length(); ++i) {
+        EEPROM.write(address++, ssid[i]);
     }
+    EEPROM.write(address++, 0);
 
-    EEPROM.commit();
-}
-bool EEPROMManager::readEepromSsid(String& ssid) {
-    EEPROM.begin(EEPROM_SIZE);
-
-    char charArray[EEPROM_SIZE - SSID_ADRESS];
-    int i = 0;
-
-    while (i < (EEPROM_SIZE - SSID_ADRESS - 1)) {
-        char c = EEPROM.read(SSID_ADRESS + i);
-        if (c == '\0') {
-            break;
-        }
-        charArray[i++] = c;
+    for (size_t i = 0; i < password.length(); ++i) {
+        EEPROM.write(address++, password[i]);
     }
-
-    charArray[i] = '\0';
-
-    ssid = String(charArray);
-
-    if (ssid.length() == 0) {
-        return false;
-    }
-
-    return true;
-}
-void EEPROMManager::clearEepromSsid() {
-
-    EEPROM.begin(EEPROM_SIZE);
-
-    for (int i = 0; i < 50; ++i) {
-        EEPROM.write(SSID_ADRESS + i, 0);
-    }
+    EEPROM.write(address++, 0);
 
     EEPROM.commit();
 }
 
-//----------------------------------------------------
-// Save, read, clear password
-//----------------------------------------------------
-
-void EEPROMManager::saveEepromPsw(String psw) {
-    clearEepromSsid();
+bool EEPROMManager::readWiFiCredentials(String& ssid, String& password) {
     EEPROM.begin(EEPROM_SIZE);
 
-    const char* charPointer = psw.c_str();
-    int length = psw.length();
-
-    for (int i = 0; i <= length; ++i) {
-        EEPROM.write(PSW_ADRESS + i, charPointer[i]);
+    int address = SSID_PSW_ADRESS[0];
+    String storedSSID = "";
+    char ch;
+    while ((ch = EEPROM.read(address++)) != 0) {
+        storedSSID += ch;
     }
 
-    EEPROM.commit();
+    String storedPassword = "";
+    while ((ch = EEPROM.read(address++)) != 0) {
+        storedPassword += ch;
+    }
+
+    if (storedSSID.length() > 0 && storedPassword.length() > 0) {
+        ssid = storedSSID;
+        password = storedPassword;
+        return true;
+    }
+    return false;
 }
-bool EEPROMManager::readEepromPsw(String& psw) {
+
+void EEPROMManager::clearWiFiCredentials() {
     EEPROM.begin(EEPROM_SIZE);
 
-    char charArray[EEPROM_SIZE - PSW_ADRESS];
-    int i = 0;
-
-    while (i < (EEPROM_SIZE - PSW_ADRESS - 1)) {
-        char c = EEPROM.read(PSW_ADRESS + i);
-        if (c == '\0') {
-            break;
-        }
-        charArray[i++] = c;
-    }
-
-    charArray[i] = '\0';
-
-    psw = String(charArray);
-
-    if (psw.length() == 0) {
-        return false;
-    }
-
-    return true;
-}
-void EEPROMManager::clearEepromPsw() {
-
-    EEPROM.begin(EEPROM_SIZE);
-
-    for (int i = 0; i < 100; ++i) {
-        EEPROM.write(PSW_ADRESS + i, 0);
+    int address = SSID_PSW_ADRESS[0];
+    for (int i = 0; i < SSID_PSW_ADRESS[1]; ++i) {
+        EEPROM.write(address++, 0);
     }
 
     EEPROM.commit();

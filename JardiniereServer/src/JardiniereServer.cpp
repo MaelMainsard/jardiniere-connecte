@@ -16,7 +16,7 @@ void JardiniereServer::loop() {
     webServer.handleClient();
 
     String ssid, password;
-    if (WiFi.status() != WL_CONNECTED && eepromManager.readEepromSsid(ssid) && eepromManager.readEepromPsw(password)) {
+    if (WiFi.status() != WL_CONNECTED && eepromManager.readWiFiCredentials(ssid, password)) {
         unsigned long currentMillis = millis();
         if (!attemptingReconnect && (currentMillis - lastReconnectAttempt >= reconnectInterval)) {
             attemptingReconnect = true;
@@ -25,7 +25,7 @@ void JardiniereServer::loop() {
             attemptingReconnect = false;
         }
     }
-    else if(WiFi.status() != WL_CONNECTED && !eepromManager.readEepromSsid(ssid) && !eepromManager.readEepromPsw(password)){
+    else if(WiFi.status() != WL_CONNECTED && !eepromManager.readWiFiCredentials(ssid, password)){
         ledManager.notConnectedToWifi();
     }
     else {
@@ -36,7 +36,7 @@ void JardiniereServer::loop() {
 
 void JardiniereServer::scanAndReconnect() {
     String ssid, password;
-    if (eepromManager.readEepromSsid(ssid) && eepromManager.readEepromPsw(password)) {
+    if (eepromManager.readWiFiCredentials(ssid, password)) {
         connectToWiFi(ssid, password);
     }
 }
@@ -72,9 +72,7 @@ void JardiniereServer::connectToWiFi(const String& ssid, const String& password)
     }
 
     if (WiFi.status() == WL_CONNECTED) {
-        eepromManager.saveEepromSsid(ssid);
-        eepromManager.saveEepromPsw(password);
-
+        eepromManager.saveWiFiCredentials(ssid, password);
         webServer.sendHeader("Location", "/disconnect");
         webServer.send(302, "text/plain", "");
     } else {
@@ -105,9 +103,7 @@ void JardiniereServer::handleDisconnect() {
         WiFi.disconnect();
         webServer.sendHeader("Location", "/");
         webServer.send(302, "text/plain", "");
-
-        eepromManager.clearEepromSsid();
-        eepromManager.clearEepromPsw();
+        eepromManager.clearWiFiCredentials();
     }
 }
 

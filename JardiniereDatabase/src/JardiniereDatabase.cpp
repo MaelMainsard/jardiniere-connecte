@@ -69,6 +69,7 @@ void JardiniereDatabase::getDbAirHum(){
 		}
 	}
 
+
 	float eepromAirHum;
 	bool eepromExists = eepromManager.readEepromAirHum(eepromAirHum);
 
@@ -84,6 +85,7 @@ void JardiniereDatabase::getDbAirHum(){
 	} else {
 		display.displayAirHum(eepromExists ? String(eepromAirHum,1) : "?");
 	}
+
 
 }
 

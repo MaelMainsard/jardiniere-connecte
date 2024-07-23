@@ -5,26 +5,22 @@
 #include <EEPROM.h>
 
 #define EEPROM_SIZE 512
-#define AIR_HUM_ADRESS 0
-#define GND_HUM_ADRESS 50
-#define TEMP_ADRESS 100
-#define LUM_ADRESS 150
-#define UPD_INT_ADRESS 200
-#define SND_INT_ADRESS 250
-#define SSID_ADRESS 300
-#define PSW_ADRESS 350
-
 
 class EEPROMManager {
 public:
     EEPROMManager();
-    void saveEepromSsid(String ssid);
-    bool readEepromSsid(String& ssid);
-    void clearEepromSsid();
 
-    void saveEepromPsw(String psw);
-    bool readEepromPsw(String& psw);
-    void clearEepromPsw();
+    const int SSID_PSW_ADRESS[2] = {0,99};
+    const int AIR_HUM_ADRESS[2] = {100,149};
+    const int GND_HUM_ADRESS[2] = {150,199};
+    const int TEMP_ADRESS[2] = {200,249};
+    const int LUM_ADRESS[2] = {250,299};
+    const int UPD_INT_ADRESS[2] = {300,349};
+    const int SND_INT_ADRESS[2] = {350,399};
+
+    void saveWiFiCredentials(const String& ssid, const String& password);
+    bool readWiFiCredentials(String& ssid, String& password);
+    void clearWiFiCredentials();
 
     void saveEepromAirHum(float value);
     bool readEepromAirHum(float& value);
