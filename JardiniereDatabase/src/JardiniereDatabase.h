@@ -34,6 +34,7 @@ private:
     EEPROMManager eepromManager;
 
     String getTimestamp();
+	String formatTime(long seconds);
 	void connectDatabase();
 
 	void getDbAirHum();

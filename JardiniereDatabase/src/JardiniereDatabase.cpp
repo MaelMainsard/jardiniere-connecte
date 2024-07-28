@@ -234,7 +234,7 @@ void JardiniereDatabase::getDbIntUpd(){
 			if(newInterval > 0 && newInterval != intervalUpt){
 				intervalUpt = newInterval;
 			}
-			display.displayIntUpd(String(fbdo.floatData(), 1));
+			display.displayIntUpd(formatTime(fbdo.floatData()));
 		}
 	}
 
@@ -249,7 +249,7 @@ void JardiniereDatabase::getDbIntSend(){
 			if(newInterval > 0 && newInterval != intervalSnd){
 				intervalSnd = newInterval;
 			}
-			display.displayIntSend(String(fbdo.floatData(),1));
+			display.displayIntSend(formatTime(fbdo.floatData()));
 		}
 	}
 }
@@ -259,4 +259,29 @@ String JardiniereDatabase::getTimestamp() {
     timeClient.update();
     unsigned long epochTime = timeClient.getEpochTime();
     return String(epochTime);
+}
+
+String JardiniereDatabase::formatTime(long seconds) {
+    long days = seconds / 86400;
+    seconds %= 86400;
+    long hours = seconds / 3600;
+    seconds %= 3600;
+    long minutes = seconds / 60;
+    seconds %= 60;
+
+    String result = "";
+    if (days > 0) {
+        result += String(days) + "d ";
+    }
+    if (hours > 0) {
+        result += String(hours) + "h ";
+    }
+    if (minutes > 0) {
+        result += String(minutes) + "m ";
+    }
+    if (seconds > 0) {
+        result += String(seconds) + "s ";
+    }
+
+    return result;
 }
