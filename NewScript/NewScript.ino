@@ -9,6 +9,7 @@ JardiniereDatabase jardinierDatabase(DEVICE_NAME);
 void setup() {
     jardinierDatabase.begin();
     jardinierServer.begin();
+    Serial.begin(115200);
 }
 
 void loop() {

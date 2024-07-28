@@ -15,8 +15,6 @@ public:
     const int GND_HUM_ADRESS[2] = {150,199};
     const int TEMP_ADRESS[2] = {200,249};
     const int LUM_ADRESS[2] = {250,299};
-    const int UPD_INT_ADRESS[2] = {300,349};
-    const int SND_INT_ADRESS[2] = {350,399};
 
     void saveWiFiCredentials(const String& ssid, const String& password);
     bool readWiFiCredentials(String& ssid, String& password);
@@ -37,14 +35,6 @@ public:
     void saveEepromLum(float value);
     bool readEepromLum(float& value);
     void clearEepromLum();
-
-    void saveEepromUpdInt(float value);
-    bool readEepromUpdInt(float& value);
-    void clearEepromUpdInt();
-
-    void saveEepromSndInt(float value);
-    bool readEepromSndInt(float& value);
-    void clearEepromSndInt();
 
 
 private:

@@ -7,6 +7,7 @@ DisplayManager::DisplayManager()
 void DisplayManager::init(){
     display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDRESS);
     display.clearDisplay();
+    display.display();
     display.drawLine(SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT, SSD1306_WHITE);
     displayDbDisconnected();
 }

@@ -66,7 +66,7 @@ void JardiniereServer::connectToWiFi(const String& ssid, const String& password)
     WiFi.begin(ssid.c_str(), password.c_str());
     int attempt = 0;
 
-    while (WiFi.status() != WL_CONNECTED && attempt < 30) {
+    while (WiFi.status() != WL_CONNECTED && attempt < 60) {
         delay(500);
         attempt++;
     }
