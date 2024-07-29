@@ -1,10 +1,11 @@
 #include "JardiniereDatabase.h"
 
 JardiniereDatabase::JardiniereDatabase(const String& deviceName)
-  : deviceName(deviceName), databaseIsConnect(false),eepromManager(), timeClient(ntpUDP), display() {}
+  : deviceName(deviceName), databaseIsConnect(false),eepromManager(),sensorManager(), timeClient(ntpUDP), display() {}
 
 void JardiniereDatabase::begin() {
 	display.init();
+	sensorManager.begin();
     timeClient.begin();
 	displayEepromValues();
 }
@@ -68,7 +69,7 @@ void JardiniereDatabase::sendingInterval(){
 
 void JardiniereDatabase::sendSensorData(){
 	// Send sensor data here the sensor data here
-	sendDbAirHum(75.7);
+	sendDbAirHum(sensorManager.readSensorData().airHumidity);
 }
 
 void JardiniereDatabase::getAllDataDromDb(){

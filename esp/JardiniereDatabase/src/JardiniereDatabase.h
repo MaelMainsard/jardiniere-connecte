@@ -8,6 +8,8 @@
 #include <WiFiUdp.h>
 #include <DisplayManager.h>
 #include <EEPROMManager.h>
+#include <SensorManager.h>
+#include "SensorData.h"
 
 class JardiniereDatabase {
 public:
@@ -32,6 +34,7 @@ private:
     NTPClient timeClient;
     DisplayManager display;
     EEPROMManager eepromManager;
+	SensorManager sensorManager;
 
     String getTimestamp();
 	String formatTime(long seconds);
