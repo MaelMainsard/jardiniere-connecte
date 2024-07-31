@@ -9,7 +9,7 @@
 #include <DisplayManager.h>
 #include <EEPROMManager.h>
 #include <SensorManager.h>
-#include "SensorData.h"
+#include "../shared/SensorData.h"
 
 class JardiniereDatabase {
 public:

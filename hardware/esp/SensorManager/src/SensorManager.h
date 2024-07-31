@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
-#include "SensorData.h"
+#include "../shared/SensorData.h"
 
 #define SENSOR_ADDRESS 8
 
