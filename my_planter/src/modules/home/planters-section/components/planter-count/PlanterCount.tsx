@@ -9,17 +9,18 @@ export const PlanterCount = () => {
 
     useEffect(() => {
         const fetchPlanterCount = async () => {
-          try {
-            const result = await getPlanterCount();
-            setCount(result);
-            setLoading(false);
-          } catch (error) {
-            setLoading(false);
-          }
+            try {
+                const result = await getPlanterCount();
+                setCount(result);
+            } catch (error) {
+                console.error("Error fetching planter count:", error);
+            } finally {
+                setLoading(false);
+            }
         };
-    
+
         fetchPlanterCount();
-      }, []);
+    }, []);
 
     return(
         <>

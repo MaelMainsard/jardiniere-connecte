@@ -15,8 +15,9 @@ export const PlanterCaroussel = () => {
             try {
                 const result = await getPlantersInfo();
                 setPlantersInfo(result);
-                setLoading(false);
             } catch (error) {
+                setLoading(false);
+            } finally {
                 setLoading(false);
             }
         };

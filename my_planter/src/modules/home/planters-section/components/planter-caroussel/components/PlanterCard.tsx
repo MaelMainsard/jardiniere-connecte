@@ -33,11 +33,11 @@ export const PlanterCard:React.FC<{data: PlanterInfoInterface}> = ({data}) => {
                 })()}
             </div>
             <img src={data.img} className="absolute top-[-30px] left-5" alt="Planter"/>
-            <div className="absolute bottom-0 mx-4 mb-4">
-                <h1 className="text-white font-semibold text-md">{data.name}</h1>
-                <h2 className="text-white font-thin text-xs">{data.plant}</h2>
+            <div className="flex flex-col absolute w-32 bottom-0 p-4 justify-start item-start">
+                <h1 className="text-white text-start font-semibold text-md">{data.name}</h1>
+                <h2 className="text-white text-start font-thin text-xs">{data.plant}</h2>
             </div>
-         
+
         </button>
     );
 }

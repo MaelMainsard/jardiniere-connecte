@@ -25,14 +25,19 @@ export const Data = () => {
     return(
         <>
             {loading ? (
-                <div className="skeleton h-80 w-40 rounded-3xl"></div>
+                <div className="flex flex-col">
+                    <DataWidget value={"XX"} type='Air Humidity'/>
+                    <DataWidget value={"XX"}  type='Ground Humidity'/>
+                    <DataWidget value={"XX"}  type='Luminosity'/>
+                    <DataWidget value={"XX"}  type='Temperature'/>
+                </div>
             ) : (
                 <>
                     {data ? (
                         <div className="flex flex-col">
-                            <DataWidget value={data.air_humidity+" %"} type='Air Humidity' />
-                            <DataWidget value={data.ground_humidity+" %"} type='Ground Humidity' />
-                            <DataWidget value={data.luminosity+" lm"} type='Luminosity' />
+                            <DataWidget value={data.air_humidity + " %"} type='Air Humidity'/>
+                            <DataWidget value={data.ground_humidity + " %"} type='Ground Humidity'/>
+                            <DataWidget value={data.luminosity + " lm"} type='Luminosity'/>
                             <DataWidget value={data.temperature+" °C"} type='Temperature' />
                         </div>
                     ) : (
