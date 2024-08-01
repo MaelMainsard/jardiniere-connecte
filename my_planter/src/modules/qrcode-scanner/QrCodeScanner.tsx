@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Player } from '@lottiefiles/react-lottie-player';
 
 import QrScanner from "qr-scanner";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -20,10 +21,6 @@ export const QrCodeScanner = () => {
 
     // Success
     const onScanSuccess = (result: QrScanner.ScanResult) => {
-        // 🖨 Print the "result" to browser console.
-        console.log(result);
-        // ✅ Handle success.
-        // 😎 You can do whatever you want with the scanned result.
         setScannedResult(result?.data);
     };
 
@@ -66,13 +63,6 @@ export const QrCodeScanner = () => {
         };
     }, []);
 
-    // ❌ If "camera" is not allowed in browser permissions, show an alert.
-    useEffect(() => {
-        if (!qrOn)
-            alert(
-                "Camera is blocked or not accessible. Please allow camera in your browser permissions and Reload."
-            );
-    }, [qrOn]);
 
     return (
 
@@ -87,8 +77,19 @@ export const QrCodeScanner = () => {
             </button>
 
             <div className="flex flex-col items-center">
-                <video ref={videoEl} className="object-cover w-80 h-80 rounded-3xl mb-5"></video>
-                <input type="text" placeholder="Type the id here" className="input input-bordered w-80 mb-3"/>
+                {!qrOn ? (
+                    <div className="w-80 h-80 rounded-3xl mb-5">
+                        <Player
+                            src='https://lottie.host/1a7ff2f9-efe8-4e17-ae4d-3f4475229a69/oB9niqp5Zw.json'
+                            className="player"
+                            loop
+                            autoplay
+                        />
+                    </div>
+                ) : (
+                    <video ref={videoEl} className="object-cover w-80 h-80 rounded-3xl mb-5"></video>
+                )}
+                <input type="text" placeholder="Type the id here" value={scannedResult} className="input input-bordered w-80 mb-3"/>
                 <button className="btn w-80">Next</button>
             </div>
 
