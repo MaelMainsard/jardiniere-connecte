@@ -4,10 +4,14 @@ import { faGear } from "@fortawesome/free-solid-svg-icons";
 import { faTableColumns } from "@fortawesome/free-solid-svg-icons";
 
 import { useNavigate,useLocation   } from 'react-router-dom';
-import { Data } from "./components/data/Data";
+
 import {
     PlanterInfoInterface
 } from "../home/planters-section/components/planter-caroussel/entities/PlanterInfo.interface.ts";
+import { AirHumidity } from "./components/data/components/air-humidity/AirHumidity.tsx";
+import { GroundHumidity } from "./components/data/components/ground-humidity/GroundHumidity.tsx";
+import { Luminosity } from "./components/data/components/luminosity/Luminosity.tsx";
+import { Temperature } from "./components/data/components/temperature/Temperature.tsx";
 
 export const PlanterOverview = () => {
     const navigate = useNavigate ();
@@ -41,7 +45,10 @@ export const PlanterOverview = () => {
 
             <div className="w-screen mt-5  flex justify-end">
                 <div className="flex flex-col mr-8">
-                    <Data/>
+                    <AirHumidity/>
+                    <GroundHumidity/>
+                    <Luminosity/>
+                    <Temperature/>
                 </div>
             </div>
 
