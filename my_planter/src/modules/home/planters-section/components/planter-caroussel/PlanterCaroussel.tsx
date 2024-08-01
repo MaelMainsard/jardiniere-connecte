@@ -23,26 +23,20 @@ export const PlanterCaroussel = () => {
 
 
     return (
-        <div className='flex space-x-4'>
+        <div className='carousel carousel-center rounded-box space-x-4'>
             {plantersInfo == null ? (
-                <div className="skeleton h-40 w-32 rounded-3xl" style={{ marginTop: "50px" }}></div>
+                <div className="skeleton carousel-item h-40 w-32 rounded-3xl" style={{ marginTop: "50px" }}></div>
             ) : (
                 <>
-                    {plantersInfo ? (
-                        <div className="carousel carousel-center rounded-box space-x-4">
-                            {plantersInfo.map((info) => (
-                                  <div key={info.id} style={{ marginTop: "50px" }}>
-                                  <PlanterCard data={info} />
-                              </div>
-                            ))}
+                    {plantersInfo.map((info) => (
+                        <div key={info.id} style={{ marginTop: "50px" }}>
+                            <PlanterCard data={info} />
                         </div>
-                    ) : (
-                        <span>No data available</span>
-                    )}
+                    ))}
                 </>
             )}
-            <div className="h-40 w-32 rounded-3xl border-dashed border-neutral border-4 flex flex-col justify-center items-center" style={{ marginTop: "50px" }}>
-                <FontAwesomeIcon icon={faQrcode} className="text-black h-8 " />
+            <div className="h-40 w-32 bg-white rounded-3xl border-dashed border-neutral border-4 carousel-item flex flex-col justify-center items-center" style={{ marginTop: "50px" }}>
+                <FontAwesomeIcon icon={faQrcode} className="text-neutral h-8 " />
             </div>
         </div>
     );
