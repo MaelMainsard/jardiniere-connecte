@@ -6,8 +6,15 @@ import { PlanterCard } from './components/PlanterCard';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
+import {useNavigate} from "react-router-dom";
 
 export const PlanterCaroussel = () => {
+
+    const navigate = useNavigate ();
+
+    const openQrReader = () => {
+        navigate('/qrcode-scanner');
+    }
 
     const [plantersInfo, setPlantersInfo] = useState<PlanterInfoInterface[] | null>(null);
 
@@ -35,7 +42,7 @@ export const PlanterCaroussel = () => {
                     ))}
                 </>
             )}
-            <div className="h-40 w-32 bg-white rounded-3xl border-dashed border-neutral border-4 carousel-item flex flex-col justify-center items-center" style={{ marginTop: "50px" }}>
+            <div onClick={()=>openQrReader()} className="h-40 w-32 bg-white rounded-3xl border-dashed border-neutral border-4 carousel-item flex flex-col justify-center items-center" style={{ marginTop: "50px" }}>
                 <FontAwesomeIcon icon={faQrcode} className="text-neutral h-8 " />
             </div>
         </div>
