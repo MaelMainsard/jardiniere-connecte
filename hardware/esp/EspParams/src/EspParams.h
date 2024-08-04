@@ -19,5 +19,7 @@ public:
     static String generateRandomID(int length);
     static String generateRandomUUID();
 
+    String getUid();
+
 };
 #endif

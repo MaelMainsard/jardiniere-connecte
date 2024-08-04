@@ -5,7 +5,7 @@ JardiniereServer::JardiniereServer()
 
 
 void JardiniereServer::init(){
-    eepromManager.clearEspParams();
+
     EspParams params;
     if(!eepromManager.readEspParams(params)){
         String uid = EspParams::generateRandomUUID();
@@ -14,11 +14,13 @@ void JardiniereServer::init(){
 
         eepromManager.saveEspParams(EspParams(uid,esp_ssid,esp_psw));
     }
+    Serial.println(params.uid);
 }
 
 
 
 void JardiniereServer::begin(){
+    Serial.begin(115200);
     init();
     setupWebServerAndDNS();
     scanAvailableNetworks();

@@ -4,33 +4,32 @@ WifiParams::WifiParams(String ssid, String psw)
     : ssid(ssid), psw(psw) {}
 
 String WifiParams::toString() const {
-    return ssid + ":::SP:::" + psw;
+    return "ssid="+ssid+"###psw="+psw+"###";
 }
 
 WifiParams WifiParams::fromString(const String& str) {
     WifiParams params;
 
-    // Convertir la chaîne en un tableau de caractères modifiable
-    char input[str.length() + 1];
-    str.toCharArray(input, sizeof(input));
+    char ssidArray[30];
+    char pswArray[100];
 
-    // Définir le modèle regex
-    const char* pattern = "(.*):::\\SP:::(.*)";
+    MatchState ms;
 
-    // Créer les objets MatchState et utiliser l'expression régulière
-    MatchState ms(input);
-    char result = ms.Match(pattern);
+    char buffer[256];
+    strncpy(buffer, str.c_str(), sizeof(buffer) - 1);
+    buffer[sizeof(buffer) - 1] = '\0';
 
-    // Vérifiez les captures
-    if (result == REGEXP_MATCHED && ms.level == 3) { // ms.level donne le nombre de captures réussies
-        char captureBuf[100]; // Assurez-vous que ce buffer est assez grand pour vos besoins
+    ms.Target(buffer);
 
-        ms.GetCapture(captureBuf, 0);
-        params.ssid = String(captureBuf);
 
-        ms.GetCapture(captureBuf, 1);
-        params.psw = String(captureBuf);
-    }
+    ms.Match ("ssid=([^###]*)");
+    ms.GetCapture(ssidArray, 0);
+    params.ssid = String(ssidArray);
+
+    ms.Match ("psw=([^###]*)");
+    ms.GetCapture(pswArray, 0);
+    params.psw = String(pswArray);
+
 
     return params;
 }
