@@ -2,113 +2,53 @@
 
 
 DisplayManager::DisplayManager()
-    : display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET) {}
+    : display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET), eepromManager() {}
 
-void DisplayManager::init(){
+void DisplayManager::begin(){
     display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDRESS);
     display.clearDisplay();
     display.display();
-    display.drawLine(SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT, SSD1306_WHITE);
-    displayDbDisconnected();
 }
 
-void DisplayManager::displayDbConnected() {
-   display.fillRect(0, 0, SCREEN_WIDTH, 15, SSD1306_BLACK);
-   display.fillRect(0, 0, SCREEN_WIDTH, 15, SSD1306_WHITE);
 
-   display.setTextColor(SSD1306_BLACK);
-   display.setTextSize(1);
-   display.setCursor(40, 4);
-   display.print("Connected");
-   display.display();
+void DisplayManager::handlePageChange(){
+  displayPage1();
 }
 
-void DisplayManager::displayDbDisconnected(){
-   display.fillRect(0, 0, SCREEN_WIDTH, 15, SSD1306_BLACK);
-   display.drawRect(0, 0, SCREEN_WIDTH, 15, SSD1306_WHITE);
+void DisplayManager::displayPage1(){
 
-   display.setTextColor(SSD1306_WHITE);
-   display.setTextSize(1);
-   display.setCursor(30, 4);
-   display.print("Disconnected");
-   display.display();
+  EspParams params;
+  if(eepromManager.readEspParams(params)){
+    String wifiCred = "WIFI:S:"+params.esp_ssid+";T:WPA2;P:"+params.esp_psw+";;";
+    generateQRCode(wifiCred);
+  }
+
 }
-// X Y
-//-------------------------------------
-// 0 0
-//-------------------------------------
-void DisplayManager::displayAirHum(String value){
-  display.fillRect(0, 15, (SCREEN_WIDTH / 2)-1, 12, SSD1306_BLACK);
-  display.setTextColor(SSD1306_WHITE);
-  display.setTextSize(1);
-  display.setCursor(5, 18);
-  display.print(value+"%");
-  display.setCursor((SCREEN_WIDTH / 2)-10, 18);
-  display.print("A");
-  display.display();
+
+void DisplayManager::displayPage2(){
+
+  EspParams params;
+  if(eepromManager.readEspParams(params)){
+    generateQRCode(params.uid);
+  }
+
 }
-//-------------------------------------
-// 0 1
-//-------------------------------------
-void DisplayManager::displayGndHum(String value){
-  display.fillRect(0, 27, (SCREEN_WIDTH / 2)-1, 12, SSD1306_BLACK);
-  display.setTextColor(SSD1306_WHITE);
-  display.setTextSize(1);
-  display.setCursor(5, 30);
-  display.print(value+"%");
-  display.setCursor((SCREEN_WIDTH / 2)-10, 30);
-  display.print("G");
-  display.display();
-}
-//-------------------------------------
-// 0 2
-//-------------------------------------
-void DisplayManager::displayTemp(String value){
-  display.fillRect(0, 39, (SCREEN_WIDTH / 2)-1, 12, SSD1306_BLACK);
-  display.setTextColor(SSD1306_WHITE);
-  display.setTextSize(1);
-  display.setCursor(5, 42);
-  display.print(value+"C");
-  display.setCursor((SCREEN_WIDTH / 2)-10, 42);
-  display.print("T");
-  display.display();
-}
-//--------------------------------------
-// 0 3
-//--------------------------------------
-void DisplayManager::displayLum(String value){
-  display.fillRect(0, 51, (SCREEN_WIDTH / 2)-1, 12, SSD1306_BLACK);
-  display.setTextColor(SSD1306_WHITE);
-  display.setTextSize(1);
-  display.setCursor(5, 54);
-  display.print(value+"lm");
-  display.setCursor((SCREEN_WIDTH / 2)-10, 54);
-  display.print("L");
-  display.display();
-}
-//--------------------------------------
-// 1 0
-//--------------------------------------
-void DisplayManager::displayIntUpd(String value){
-  display.fillRect((SCREEN_WIDTH / 2)+1, 15, SCREEN_WIDTH / 2, 12, SSD1306_BLACK);
-  display.setTextColor(SSD1306_WHITE);
-  display.setTextSize(1);
-  display.setCursor((SCREEN_WIDTH / 2)+6, 18);
-  display.print(value);
-  display.setCursor(SCREEN_WIDTH - 10, 18);
-  display.print("R");
-  display.display();
-}
-//--------------------------------------
-// 1 1
-//--------------------------------------
-void DisplayManager::displayIntSend(String value){
-  display.fillRect((SCREEN_WIDTH / 2)+1, 27, SCREEN_WIDTH / 2, 12, SSD1306_BLACK);
-  display.setTextColor(SSD1306_WHITE);
-  display.setTextSize(1);
-  display.setCursor((SCREEN_WIDTH / 2)+6, 30);
-  display.print(value);
-  display.setCursor(SCREEN_WIDTH - 10, 30);
-  display.print("S");
+
+void DisplayManager::generateQRCode(String text) {
+  const char* textCStr = text.c_str();
+  QRCode qrcode;
+  uint8_t qrcodeData[qrcode_getBufferSize(3)];
+  qrcode_initText(&qrcode, qrcodeData, 3, 0, textCStr);
+  display.clearDisplay();
+  int scale = min(SCREEN_WIDTH / qrcode.size, SCREEN_HEIGHT / qrcode.size);
+  int shiftX = (SCREEN_WIDTH - qrcode.size * scale) / 2;
+  int shiftY = (SCREEN_HEIGHT - qrcode.size * scale) / 2;
+  for (uint8_t y = 0; y < qrcode.size; y++) {
+    for (uint8_t x = 0; x < qrcode.size; x++) {
+      if (qrcode_getModule(&qrcode, x, y)) {
+        display.fillRect(shiftX + x * scale, shiftY + y * scale, scale, scale, SSD1306_WHITE);
+      }
+    }
+  }
   display.display();
 }

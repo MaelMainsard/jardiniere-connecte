@@ -3,7 +3,7 @@
 
 const String DEVICE_NAME = "Jardiniere_1";
 
-JardiniereServer jardinierServer(DEVICE_NAME);
+JardiniereServer jardinierServer;
 JardiniereDatabase jardinierDatabase(DEVICE_NAME);
 
 void setup() {

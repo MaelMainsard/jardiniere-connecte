@@ -7,18 +7,19 @@
 #include <DNSServer.h>
 #include <LedManager.h>
 #include <EEPROMManager.h>
+#include <EspParams.h>
+#include <WifiParams.h>
 
 #define DNS_PORT 53
 #define MAX_NETWORKS 20
 
 class JardiniereServer {
 public:
-    JardiniereServer(const String& deviceName);
+    JardiniereServer();
 	void begin();
     void loop();
 
 private:
-    String deviceName;
     String availableSSIDs[MAX_NETWORKS];
     int networkCount;
 
@@ -31,10 +32,11 @@ private:
 	LedManager ledManager;
     EEPROMManager eepromManager;
 
+	void init();
     void setupWebServerAndDNS();
     void scanAvailableNetworks();
 	void scanAndReconnect();
-    void connectToWiFi(const String& ssid, const String& password);
+    void connectToWiFi(const WifiParams& params);
 
     void handleRootRequest();
     void handleFormSubmission();

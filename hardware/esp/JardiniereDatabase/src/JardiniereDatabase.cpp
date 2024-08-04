@@ -1,13 +1,13 @@
 #include "JardiniereDatabase.h"
 
-JardiniereDatabase::JardiniereDatabase(const String& deviceName)
-  : deviceName(deviceName), databaseIsConnect(false),eepromManager(),sensorManager(), timeClient(ntpUDP), display() {}
+JardiniereDatabase::JardiniereDatabase()
+  : databaseIsConnect(false),eepromManager(),sensorManager(), timeClient(ntpUDP) {
+  	pinMode(D5, OUTPUT);
+  }
 
 void JardiniereDatabase::begin() {
-	display.init();
 	sensorManager.begin();
     timeClient.begin();
-	displayEepromValues();
 }
 
 void JardiniereDatabase::connectDatabase() {
@@ -25,6 +25,7 @@ void JardiniereDatabase::connectDatabase() {
 
 void JardiniereDatabase::loop() {
 
+
     if(WiFi.status() == WL_CONNECTED && !databaseIsConnect){
     	connectDatabase();
     }
@@ -33,25 +34,12 @@ void JardiniereDatabase::loop() {
     }
 
 	if(databaseIsConnect){
-		display.displayDbConnected();
-		updateInterval();
+		digitalWrite(D5, HIGH);
 		sendingInterval();
 	}
 	else {
-		display.displayDbDisconnected();
+		digitalWrite(D5, LOW);
 	}
-
-}
-
-void JardiniereDatabase::updateInterval(){
-
-	unsigned long currentMillis = millis();
-  	if (currentMillis - previousUptMillis >= intervalUpt) {
-    	previousUptMillis = currentMillis;
-   		getAllDataDromDb();
-  	}
-	getDbIntUpd();
-	getDbIntSend();
 
 }
 
@@ -77,6 +65,7 @@ void JardiniereDatabase::getAllDataDromDb(){
 	getDbGndHum();
 	getDbTemp();
 	getDbLum();
+	getDbIntSend();
 }
 
 float JardiniereDatabase::truncateToOneDecimal(float number) {
@@ -128,24 +117,27 @@ float JardiniereDatabase::getEepromLum(){
 }
 
 void JardiniereDatabase::displayEepromValues(){
+/*
 	display.displayAirHum(getEepromAirHum() != -1.0 ? String(getEepromAirHum(),1) : "__");
 	display.displayGndHum(getEepromGndHum() != -1.0 ? String(getEepromGndHum(),1) : "__");
 	display.displayTemp(getEepromTemp() != -1.0 ? String(getEepromTemp(),1) : "__");
 	display.displayLum(getEepromLum() != -1.0 ? String(getEepromLum(),1) : "__");
 	display.displayIntUpd("__");
 	display.displayIntSend("__");
+
+ */
 }
 
 
 
 void JardiniereDatabase::getDbAirHum(){
 	if (Firebase.ready() && databaseIsConnect) {
-		String path = "/" + String(deviceName) + "/air-humidity/percentage";
+		String path = "/" + getUid() + "/air-humidity/percentage";
 		if (Firebase.RTDB.getFloat(&fbdo, path)) {
 			if (fbdo.floatData() != getEepromAirHum()) {
 				eepromManager.clearEepromAirHum();
 				eepromManager.saveEepromAirHum(fbdo.floatData());
-				display.displayAirHum(String(fbdo.floatData(),1));
+				//display.displayAirHum(String(fbdo.floatData(),1));
 			}
 		}
 	}
@@ -153,7 +145,7 @@ void JardiniereDatabase::getDbAirHum(){
 
 void JardiniereDatabase::sendDbAirHum(float airHumidity){
 	if (Firebase.ready() && databaseIsConnect) {
-		String path = "/" + String(deviceName) + "/air-humidity/data";
+		String path = "/" + getUid() + "/air-humidity/data";
     	String timestamp = getTimestamp();
     	String fullPath = path + "/" + timestamp;
     	Firebase.RTDB.setFloat(&fbdo, fullPath, airHumidity);
@@ -162,12 +154,12 @@ void JardiniereDatabase::sendDbAirHum(float airHumidity){
 
 void JardiniereDatabase::getDbGndHum(){
 	if (Firebase.ready() && databaseIsConnect) {
-		String path = "/" + String(deviceName) + "/ground-humidity/percentage";
+		String path = "/" + getUid() + "/ground-humidity/percentage";
 		if (Firebase.RTDB.getFloat(&fbdo, path)) {
 			if (fbdo.floatData() != getEepromGndHum()) {
 				eepromManager.clearEepromGndHum();
 				eepromManager.saveEepromGndHum(fbdo.floatData());
-				display.displayGndHum(String(fbdo.floatData(),1));
+				//display.displayGndHum(String(fbdo.floatData(),1));
 			}
 		}
 	}
@@ -175,7 +167,7 @@ void JardiniereDatabase::getDbGndHum(){
 
 void JardiniereDatabase::sendDbGndHum(float gndHumidity){
 	if (Firebase.ready() && databaseIsConnect) {
-		String path = "/" + String(deviceName) + "/ground-humidity/data";
+		String path = "/" + getUid() + "/ground-humidity/data";
     	String timestamp = getTimestamp();
     	String fullPath = path + "/" + timestamp;
     	Firebase.RTDB.setFloat(&fbdo, fullPath, gndHumidity);
@@ -184,12 +176,12 @@ void JardiniereDatabase::sendDbGndHum(float gndHumidity){
 
 void JardiniereDatabase::getDbTemp(){
 	if (Firebase.ready() && databaseIsConnect) {
-		String path = "/" + String(deviceName) + "/temperature/degre";
+		String path = "/" + getUid() + "/temperature/degre";
 		if (Firebase.RTDB.getFloat(&fbdo, path)) {
 			if (fbdo.floatData() != getEepromTemp()) {
 				eepromManager.clearEepromTemp();
 				eepromManager.saveEepromTemp(fbdo.floatData());
-				display.displayTemp(String(fbdo.floatData(),1));
+				//display.displayTemp(String(fbdo.floatData(),1));
 			}
 		}
 	}
@@ -197,7 +189,7 @@ void JardiniereDatabase::getDbTemp(){
 
 void JardiniereDatabase::sendDbTemp(float temp){
 	if (Firebase.ready() && databaseIsConnect) {
-		String path = "/" + String(deviceName) + "/temperature/data";
+		String path = "/" + getUid() + "/temperature/data";
     	String timestamp = getTimestamp();
     	String fullPath = path + "/" + timestamp;
     	Firebase.RTDB.setFloat(&fbdo, fullPath, temp);
@@ -206,12 +198,12 @@ void JardiniereDatabase::sendDbTemp(float temp){
 
 void JardiniereDatabase::getDbLum(){
 	if (Firebase.ready() && databaseIsConnect) {
-		String path = "/" + String(deviceName) + "/luminosity/lumen";
+		String path = "/" + getUid() + "/luminosity/lumen";
 		if (Firebase.RTDB.getFloat(&fbdo, path)) {
 			if (fbdo.floatData() != getEepromLum()) {
 				eepromManager.clearEepromLum();
 				eepromManager.saveEepromLum(fbdo.floatData());
-				display.displayLum(String(fbdo.floatData(),1));
+				//display.displayLum(String(fbdo.floatData(),1));
 			}
 		}
 	}
@@ -219,39 +211,30 @@ void JardiniereDatabase::getDbLum(){
 
 void JardiniereDatabase::sendDbLum(float lum){
 	if (Firebase.ready() && databaseIsConnect) {
-		String path = "/" + String(deviceName) + "/luminosity/data";
+		String path = "/" + getUid() + "/luminosity/data";
     	String timestamp = getTimestamp();
     	String fullPath = path + "/" + timestamp;
     	Firebase.RTDB.setFloat(&fbdo, fullPath, lum);
 	}
 }
 
-void JardiniereDatabase::getDbIntUpd(){
 
-	if (Firebase.ready() && databaseIsConnect) {
-		String path = "/" + String(deviceName) + "/interval/update_s";
-		if (Firebase.RTDB.getFloat(&fbdo, path)) {
-			long newInterval = (int)(fbdo.floatData()*1000);
-			if(newInterval > 0 && newInterval != intervalUpt){
-				intervalUpt = newInterval;
-			}
-			display.displayIntUpd(formatTime(fbdo.floatData()));
-		}
-	}
-
-}
 
 void JardiniereDatabase::getDbIntSend(){
-
 	if (Firebase.ready() && databaseIsConnect) {
-		String path = "/" + String(deviceName) + "/interval/sending_s";
-		if (Firebase.RTDB.getFloat(&fbdo, path)) {
-			long newInterval = (int)(fbdo.floatData()*1000);
-			if(newInterval > 0 && newInterval != intervalSnd){
-				intervalSnd = newInterval;
+
+		EspParams params;
+		if(eepromManager.readEspParams(params)){
+			String path = "/" + params.uid + "/interval/sending_s";
+			if (Firebase.RTDB.getFloat(&fbdo, path)) {
+				long newInterval = (int)(fbdo.floatData()*1000);
+				if(newInterval > 0 && newInterval != intervalSnd){
+					intervalSnd = newInterval;
+				}
+
 			}
-			display.displayIntSend(formatTime(fbdo.floatData()));
 		}
+
 	}
 }
 
@@ -260,29 +243,4 @@ String JardiniereDatabase::getTimestamp() {
     timeClient.update();
     unsigned long epochTime = timeClient.getEpochTime();
     return String(epochTime);
-}
-
-String JardiniereDatabase::formatTime(long seconds) {
-    long days = seconds / 86400;
-    seconds %= 86400;
-    long hours = seconds / 3600;
-    seconds %= 3600;
-    long minutes = seconds / 60;
-    seconds %= 60;
-
-    String result = "";
-    if (days > 0) {
-        result += String(days) + "d ";
-    }
-    if (hours > 0) {
-        result += String(hours) + "h ";
-    }
-    if (minutes > 0) {
-        result += String(minutes) + "m ";
-    }
-    if (seconds > 0) {
-        result += String(seconds) + "s ";
-    }
-
-    return result;
 }

@@ -1,0 +1,8 @@
+LedManager	KEYWORD1
+notConnectedToWifi	KEYWORD2
+notConnectedToInternet	KEYWORD2
+tryingToConnectToWifi	KEYWORD2
+isConnectedAndHaveInternet	KEYWORD2
+tryingToConnectToDatabase	KEYWORD2
+databaseIsConnected	KEYWORD2
+stopBlink	KEYWORD2

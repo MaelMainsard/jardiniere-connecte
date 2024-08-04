@@ -1,14 +1,15 @@
 #include <JardiniereServer.h>
+#include <DisplayManager.h>
 
-const String DEVICE_NAME = "JardiniereAP";
-
-JardiniereServer jardinierServer(DEVICE_NAME);
+JardiniereServer jardinierServer;
+DisplayManager display;
 
 void setup() {
-    // Initialisation du moniteur s
+    display.begin();
+    jardinierServer.begin();
 }
 
 void loop() {
-    // Appel de la méthode loop() de la bibliothèque pour gérer le serveur et les mises à jour
     jardinierServer.loop();
+    display.handlePageChange();
 }

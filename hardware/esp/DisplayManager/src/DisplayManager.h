@@ -6,6 +6,10 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <EEPROMManager.h>
+#include <qrcode.h>
+#include <EspParams.h>
+#include <WifiParams.h>
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -15,18 +19,15 @@
 class DisplayManager {
 public:
     DisplayManager();
-    void init();
-    void displayDbConnected();
-    void displayDbDisconnected();
-    void displayAirHum(String value);
-    void displayGndHum(String value);
-    void displayTemp(String value);
-    void displayLum(String value);
-    void displayIntUpd(String value);
-    void displayIntSend(String value);
+    void begin();
+    void handlePageChange();
 
 private:
     Adafruit_SSD1306 display;
+    EEPROMManager eepromManager;
+    void generateQRCode(String text);
+    void displayPage1(); // QRCode Wifi + cred
+    void displayPage2(); // QRCode Db
 };
 
 #endif

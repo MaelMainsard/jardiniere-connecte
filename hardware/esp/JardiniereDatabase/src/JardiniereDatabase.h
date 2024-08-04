@@ -6,24 +6,20 @@
 #include <ESP8266WiFi.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
-#include <DisplayManager.h>
 #include <EEPROMManager.h>
 #include <SensorManager.h>
-#include "../shared/SensorData.h"
+#include "../shared/JardiniereUtils.h"
 
 class JardiniereDatabase {
 public:
-    JardiniereDatabase(const String& deviceName);
+    JardiniereDatabase();
     void begin();
     void loop();
     bool databaseIsConnect;
 
 private:
-    String deviceName;
     String api_key = "AIzaSyBiBaPZsKrFY7om8_myBmOomVgpMgzvF2E";
     String db_url = "https://jardiniere-b4923-default-rtdb.europe-west1.firebasedatabase.app/";
-	unsigned long previousUptMillis = 0;
-	long intervalUpt = 1000;
 	unsigned long previousSndMillis = 0;
 	long intervalSnd = 1000;
 
@@ -32,7 +28,6 @@ private:
     FirebaseConfig config;
     WiFiUDP ntpUDP;
     NTPClient timeClient;
-    DisplayManager display;
     EEPROMManager eepromManager;
 	SensorManager sensorManager;
 
@@ -40,11 +35,12 @@ private:
 	String formatTime(long seconds);
 	void connectDatabase();
 
+	void getDbData();
+
 	void getDbAirHum();
 	void getDbGndHum();
 	void getDbTemp();
 	void getDbLum();
-	void getDbIntUpd();
 	void getDbIntSend();
 
 	void sendDbAirHum(float airHumidity);
@@ -58,11 +54,13 @@ private:
 	float getEepromLum();
 
 	void displayEepromValues();
-	void updateInterval();
 	void sendingInterval();
 
 	void getAllDataDromDb();
 	void sendSensorData();
+
+	String getUid();
+	String getFirstPart(String uid);
 
 	float truncateToOneDecimal(float number);
 };
