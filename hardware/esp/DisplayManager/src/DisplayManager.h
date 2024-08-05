@@ -25,9 +25,22 @@ public:
 private:
     Adafruit_SSD1306 display;
     EEPROMManager eepromManager;
-    void generateQRCode(String text);
-    void displayPage1(); // QRCode Wifi + cred
-    void displayPage2(); // QRCode Db
+
+    unsigned long lastDebounceTime = 0;
+    const unsigned long debounceDelay = 100;
+    bool lastButtonState = HIGH;
+    bool buttonState = HIGH;
+
+
+    int currentPage = 1;
+
+    void displayTitle(String str);
+    void generateQRCode(String text, int x);
+    void displayPage1(); // QRCode Wifi
+    void displayPage2(); // Wifi Cred
+    void displayPage3(); // QRCode Esp
+    void displayPage4(); // Esp Cred
+    void displayPage5(); // Esp Cred
 };
 
 #endif

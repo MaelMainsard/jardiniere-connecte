@@ -10,16 +10,16 @@ public:
     String uid;
     String esp_ssid;
     String esp_psw;
+    int interval_s;
 
     EspParams() {}
-    EspParams(String uid, String esp_ssid, String esp_psw);
+    EspParams(String uid, String esp_ssid, String esp_psw, int interval_s);
 
     String toString() const;
     static EspParams fromString(const String& str);
     static String generateRandomID(int length);
     static String generateRandomUUID();
-
-    String getUid();
+    static String formatTime(int seconds);
 
 };
 #endif

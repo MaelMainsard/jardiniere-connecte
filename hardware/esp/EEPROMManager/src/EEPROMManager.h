@@ -13,8 +13,8 @@ public:
     EEPROMManager();
 
     const int WIFI_PARAMS_ADRESS[2] = {0,99};
-    const int ESP_PARAMS_ADRESS[2] = {100,199};
-    const int DATABASE_PARAMS_ADRESS[2] = {200,299};
+    const int ESP_PARAMS_ADRESS[2] = {100,299};
+    const int DATABASE_PARAMS_ADRESS[2] = {300,345};
 
     void saveWifiParams(WifiParams params);
     bool readWifiParams(WifiParams& params);

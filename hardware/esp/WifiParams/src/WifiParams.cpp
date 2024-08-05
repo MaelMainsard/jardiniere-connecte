@@ -4,7 +4,7 @@ WifiParams::WifiParams(String ssid, String psw)
     : ssid(ssid), psw(psw) {}
 
 String WifiParams::toString() const {
-    return "ssid="+ssid+"###psw="+psw+"###";
+    return "ssid="+ssid+"psw="+psw;
 }
 
 WifiParams WifiParams::fromString(const String& str) {
@@ -22,11 +22,11 @@ WifiParams WifiParams::fromString(const String& str) {
     ms.Target(buffer);
 
 
-    ms.Match ("ssid=([^###]*)");
+    ms.Match ("ssid=([^ ]*)psw");
     ms.GetCapture(ssidArray, 0);
     params.ssid = String(ssidArray);
 
-    ms.Match ("psw=([^###]*)");
+    ms.Match ("psw=(.*)");
     ms.GetCapture(pswArray, 0);
     params.psw = String(pswArray);
 

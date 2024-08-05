@@ -11,10 +11,13 @@ void JardiniereServer::init(){
         String uid = EspParams::generateRandomUUID();
         String esp_ssid = "planter-"+EspParams::generateRandomID(6);
         String esp_psw = EspParams::generateRandomID(8);
+        int interval_s = 60;
 
-        eepromManager.saveEspParams(EspParams(uid,esp_ssid,esp_psw));
+        EspParams newParams = EspParams(uid,esp_ssid,esp_psw,interval_s);
+
+        eepromManager.saveEspParams(newParams);
     }
-    Serial.println(params.uid);
+
 }
 
 
@@ -64,7 +67,7 @@ void JardiniereServer::setupWebServerAndDNS() {
     WiFi.softAPdisconnect(true);
     EspParams params;
     eepromManager.readEspParams(params);
-    WiFi.softAP(params.esp_ssid);
+    WiFi.softAP(params.esp_ssid, params.esp_psw);
     dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
     webServer.on("/", std::bind(&JardiniereServer::handleRootRequest, this));
     webServer.on("/disconnect", std::bind(&JardiniereServer::handleDisconnectPage, this));
