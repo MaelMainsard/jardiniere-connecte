@@ -48,8 +48,11 @@ void JardiniereServer::loop() {
     else if(WiFi.status() != WL_CONNECTED && !eepromManager.readWifiParams(params)){
         ledManager.notConnectedToWifi();
     }
-    else {
+    else if(WiFi.status() != WL_CONNECTED){
         ledManager.isConnectedToWifi();
+    }
+    else if(WiFi.status() != WL_CONNECTED){
+        ledManager.notConnectedToWifi();
     }
 
 }

@@ -26,6 +26,7 @@ private:
     bool attemptingReconnect;
     unsigned long lastReconnectAttempt;
     const unsigned long reconnectInterval;
+	bool connectionInProgress;
 
     ESP8266WebServer webServer;
     DNSServer dnsServer;

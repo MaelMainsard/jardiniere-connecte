@@ -1,18 +1,20 @@
 #include <JardiniereServer.h>
 #include <JardiniereDatabase.h>
-
-const String DEVICE_NAME = "Jardiniere_1";
+#include <DisplayManager.h>
 
 JardiniereServer jardinierServer;
-JardiniereDatabase jardinierDatabase(DEVICE_NAME);
+JardiniereDatabase jardinierDatabase;
+DisplayManager myDisplay;
 
 void setup() {
+    myDisplay.begin();
     jardinierDatabase.begin();
     jardinierServer.begin();
     Serial.begin(115200);
 }
 
 void loop() {
+    myDisplay.handlePageChange();
     jardinierServer.loop();
     jardinierDatabase.loop();
 }
