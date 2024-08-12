@@ -6,37 +6,35 @@
 #define DHT22_PIN PB1
 
 dht DHT;
-
-float oldTemp;
-float oldAirHum;
+SensorsData sensorsData = SensorsData(0.0,0.0,0.0,0.0);
 
 void setup() {
   TinyWireS.begin(ADDRESS);
-  TinyWireS.onRequest(sendData);
+  TinyWireS.onRequest(sendAllData);
   pinMode(DHT22_PIN, INPUT);
 }
 
 void loop() {
- TinyWireS_stop_check();
+  TinyWireS_stop_check();
 }
 
-void sendData() {
+void sendAllData() {
   DHT.read22(DHT22_PIN);
-  
-  if(DHT.temperature != -102.30 && DHT.humidity != 102.30){
-    oldTemp = DHT.temperature;
-    oldAirHum = DHT.humidity;
+  if(DHT.humidity != 102.30){
+    sensorsData.airHumidity = DHT.humidity;
+  }
+  sensorsData.groundHumidity = getGroundHum();
+  sensorsData.luminosity = getLuminosity();
+  if(DHT.temperature != -102.30){
+    sensorsData.temperature = DHT.temperature;
   }
 
-
-  SensorsData sensorsData = SensorsData(oldAirHum, getGroundHum(), getLuminosity(), oldTemp);
   uint8_t* sensorDataPtr = (uint8_t*)&sensorsData;
   const uint8_t sensorDataSize = sizeof(SensorsData);
 
   for (uint8_t i = 0; i < sensorDataSize; i++) {
     TinyWireS.send(sensorDataPtr[i]);
   }
-
 }
 
 float getLuminosity() {

@@ -1,7 +1,9 @@
 #include "JardiniereServer.h"
 
 JardiniereServer::JardiniereServer()
-    : ledManager(D6, D7),eepromManager(),attemptingReconnect(false),lastReconnectAttempt(0),reconnectInterval(60000),webServer(80){}
+    : eepromManager(), webServer(80){
+        pinMode(LED_BUILTIN,OUTPUT);
+    }
 
 
 void JardiniereServer::init(){
@@ -21,75 +23,32 @@ void JardiniereServer::init(){
 }
 
 
-
 void JardiniereServer::begin(){
-    Serial.begin(115200);
     init();
+    Serial.begin(115200);
+    SPIFFS.begin();
     setupWebServerAndDNS();
-    scanAvailableNetworks();
-    scanAndReconnect();
 }
 
 void JardiniereServer::loop() {
-
     dnsServer.processNextRequest();
     webServer.handleClient();
 
     WifiParams params;
-    if (WiFi.status() != WL_CONNECTED && eepromManager.readWifiParams(params)) {
-        unsigned long currentMillis = millis();
-        if (!attemptingReconnect && (currentMillis - lastReconnectAttempt >= reconnectInterval)) {
-            attemptingReconnect = true;
-            lastReconnectAttempt = currentMillis;
-            scanAndReconnect();
-            attemptingReconnect = false;
-        }
-    }
-    else if(WiFi.status() != WL_CONNECTED && !eepromManager.readWifiParams(params)){
-        ledManager.notConnectedToWifi();
-    }
-    else if(WiFi.status() != WL_CONNECTED){
-        ledManager.isConnectedToWifi();
-    }
-    else if(WiFi.status() != WL_CONNECTED){
-        ledManager.notConnectedToWifi();
-    }
-
-}
-
-
-
-void JardiniereServer::scanAndReconnect() {
-    WifiParams params;
-    if (eepromManager.readWifiParams(params)) {
+    if (eepromManager.readWifiParams(params) && WiFi.status() != WL_CONNECTED) {
         connectToWiFi(params);
     }
-}
 
-void JardiniereServer::setupWebServerAndDNS() {
-    WiFi.softAPdisconnect(true);
-    EspParams params;
-    eepromManager.readEspParams(params);
-    WiFi.softAP(params.esp_ssid, params.esp_psw);
-    dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
-    webServer.on("/", std::bind(&JardiniereServer::handleRootRequest, this));
-    webServer.on("/disconnect", std::bind(&JardiniereServer::handleDisconnectPage, this));
-    webServer.on("/disconnect_action", std::bind(&JardiniereServer::handleDisconnect, this));
-    webServer.on("/submit", HTTP_POST, std::bind(&JardiniereServer::handleFormSubmission, this));
-    webServer.onNotFound(std::bind(&JardiniereServer::handleNotFound, this));
-    webServer.begin();
-}
-
-
-void JardiniereServer::scanAvailableNetworks() {
-    networkCount = WiFi.scanNetworks();
-    for (int i = 0; i < networkCount && i < MAX_NETWORKS; ++i) {
-        availableSSIDs[i] = WiFi.SSID(i);
+    if(WiFi.status() == WL_CONNECTED){
+        digitalWrite(LED_BUILTIN,LOW);
+    }
+    else {
+        digitalWrite(LED_BUILTIN,HIGH);
     }
 }
 
-void JardiniereServer::connectToWiFi(const WifiParams& params) {
-    ledManager.tryingToConnectToWifi();
+
+void JardiniereServer::connectToWiFi(WifiParams params) {
 
     WiFi.begin(params.ssid.c_str(), params.psw.c_str());
     int attempt = 0;
@@ -101,33 +60,32 @@ void JardiniereServer::connectToWiFi(const WifiParams& params) {
 
     if (WiFi.status() == WL_CONNECTED) {
         eepromManager.saveWifiParams(params);
-        webServer.sendHeader("Location", "/disconnect");
+        webServer.sendHeader("Location", "/logout");
         webServer.send(302, "text/plain", "");
     } else {
-        ledManager.notConnectedToWifi();
         webServer.sendHeader("Location", "/");
         webServer.send(302, "text/plain", "");
     }
 }
 
 
-void JardiniereServer::handleRootRequest() {
-    if (WiFi.status() == WL_CONNECTED) {
-        webServer.sendHeader("Location", "/disconnect");
-        webServer.send(302, "text/plain", "");
-    } else {
-        webServer.send(200, "text/html", generateMainPageHTML());
-    }
+
+
+void JardiniereServer::setupWebServerAndDNS() {
+    WiFi.softAPdisconnect(true);
+    EspParams params;
+    eepromManager.readEspParams(params);
+    WiFi.softAP(params.esp_ssid);
+    dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
+    webServer.on("/", HTTP_GET, std::bind(&JardiniereServer::handleRoot, this));
+    webServer.on("/logout", HTTP_GET,  std::bind(&JardiniereServer::handleDisconnect, this));
+    webServer.on("/wifiLogin", HTTP_POST, std::bind(&JardiniereServer::handleWifiLogin, this));
+    webServer.on("/wifiLogout", HTTP_POST, std::bind(&JardiniereServer::handleWifiLogout, this));
+    webServer.onNotFound(std::bind(&JardiniereServer::handleNotFound, this));
+    webServer.begin();
 }
 
-void JardiniereServer::handleFormSubmission() {
-    String ssid = webServer.arg("ssid");
-    String password = webServer.arg("password");
-    WifiParams params = {ssid,password};
-    connectToWiFi(params);
-}
-
-void JardiniereServer::handleDisconnect() {
+void JardiniereServer::handleWifiLogout() {
     if (WiFi.status() == WL_CONNECTED) {
         WiFi.disconnect();
         webServer.sendHeader("Location", "/");
@@ -136,91 +94,63 @@ void JardiniereServer::handleDisconnect() {
     }
 }
 
-void JardiniereServer::handleNotFound() {
-    if (WiFi.status() == WL_CONNECTED) {
-        webServer.sendHeader("Location", "/disconnect");
-        webServer.send(302, "text/plain", "");
-    } else {
-        handleRootRequest();
-    }
+void JardiniereServer::handleWifiLogin() {
+    String ssid = webServer.arg("ssid");
+    String password = webServer.arg("password");
+    WifiParams params = {ssid,password};
+    connectToWiFi(params);
 }
 
-void JardiniereServer::handleDisconnectPage() {
-    webServer.send(200, "text/html", generateDisconnectPageHTML());
-}
 
-String JardiniereServer::generateMainPageHTML() {
-    String html = "<!DOCTYPE html>"
-                 "<html>"
-                 "<head><title>ESP8266 Configuration</title>"
-                 "<style>"
-                 "body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f0f0; }"
-                 ".form-container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }"
-                 ".form-group { margin-bottom: 15px; }"
-                 "label { display: block; margin-bottom: 5px; }"
-                 "input[type=\"text\"], input[type=\"password\"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }"
-                 "button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }"
-                 "button:hover { background-color: #0056b3; }"
-                 "</style>"
-                 "</head>"
-                 "<body>"
-                 "<div class=\"form-container\">"
-                 "<form action=\"/submit\" method=\"post\">"
-                 "<div class=\"form-group\">"
-                 "<label for=\"ssid\">SSID:</label>"
-                 "<select id=\"ssid\" name=\"ssid\" required>";
+String JardiniereServer::getSsidArray() {
+    String ssid_array = "[";
+    int numNetworks = WiFi.scanNetworks();
 
-    if (networkCount > 0) {
-        for (int i = 0; i < networkCount && i < MAX_NETWORKS; ++i) {
-            html += "<option value=\"" + availableSSIDs[i] + "\">" + availableSSIDs[i] + "</option>";
+    for (int i = 0; i < numNetworks; ++i) {
+        ssid_array += "\"" + WiFi.SSID(i) + "\"";
+        if (i < numNetworks - 1) {
+            ssid_array += ",";
         }
-    } else {
-        html += "<option value=\"\">No networks found</option>";
     }
 
-    html += "</select>"
-            "</div>"
-            "<div class=\"form-group\">"
-            "<label for=\"password\">Password:</label>"
-            "<input type=\"password\" id=\"password\" name=\"password\" required>"
-            "</div>"
-            "<button type=\"submit\">Submit</button>"
-            "</form>"
-            "</div>"
-            "</body>"
-            "</html>";
-
-    return html;
+    return ssid_array += "]";
 }
 
-String JardiniereServer::generateDisconnectPageHTML() {
-    String html = "<!DOCTYPE html>"
-                  "<html>"
-                  "<head><title>Disconnect</title>"
-                  "<style>"
-                  "body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f0f0; }"
-                  ".button-container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }"
-                  "button { padding: 10px 20px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; }"
-                  "button:hover { background-color: #c82333; }"
-                  "</style>"
-                  "<script>"
-                  "function disconnect() {"
-                  "    fetch('/disconnect_action').then(response => {"
-                  "        if (response.ok) {"
-                  "            window.location.href = '/';"
-                  "        } else {"
-                  "            alert('Error disconnecting.');"
-                  "        }"
-                  "    });"
-                  "}"
-                  "</script>"
-                  "</head>"
-                  "<body>"
-                  "<div class=\"button-container\">"
-                  "<button onclick=\"disconnect()\">Disconnect</button>"
-                  "</div>"
-                  "</body>"
-                  "</html>";
 
-    return html;
+void JardiniereServer::handleRoot() {
+    WifiParams params;
+    if(eepromManager.readWifiParams(params)){
+        webServer.sendHeader("Location", "/logout");
+        webServer.send(302, "text/plain", "");
+    }
+    else {
+        File file = SPIFFS.open("/WifiLogin.html", "r");
+        if (!file) {
+            webServer.send(404, "text/plain", "Fichier non trouvé");
+            return;
+        }
+        String htmlContent = file.readString();
+        htmlContent.replace("{{network_array}}", getSsidArray());
+        webServer.send(200, "text/html", htmlContent);
+        file.close();
+    }
+}
+
+void JardiniereServer::handleDisconnect() {
+    File file = SPIFFS.open("/WifiLogout.html", "r");
+    if (!file) {
+        webServer.send(404, "text/plain", "Fichier non trouvé");
+        return;
+    }
+    String htmlContent = file.readString();
+    WifiParams params;
+    eepromManager.readWifiParams(params);
+    htmlContent.replace("{{ssid_name}}", params.ssid);
+    webServer.send(200, "text/html", htmlContent);
+    file.close();
+}
+
+void JardiniereServer::handleNotFound() {
+  webServer.sendHeader("Location", String("http://") + WiFi.softAPIP().toString(), true);
+  webServer.send(302, "text/plain", ""); // Redirection
 }

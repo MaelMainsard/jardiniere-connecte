@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WifiLogout</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins',sans-serif;
+        }
+        .container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .box{
+            display: flex;
+            flex-direction: row;
+            position: relative;
+            padding: 60px 20px 30px 20px;
+            height: 620px;
+            width: 350px;
+            border-radius: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+
+        }
+        .box-wifi-params{
+            position: absolute;
+            width: 85%;
+            left: 27px;
+            transition: .5s ease-in-out;
+        }
+
+        .top-header{
+            text-align: center;
+            margin: 30px 0;
+        }
+        .top-header h3{
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 8px
+        }
+        .input-group{
+            width: 100%;
+        }
+        .input-field{
+            margin: 12px 0;
+            position: relative;
+        }
+        .input-ssid{
+            position: relative;
+        }
+        .input-box{
+            width: 100%;
+            height: 50px;
+            font-size: 15px;
+            color: #040404;
+            border: none;
+            border-radius: 10px;
+            padding: 7px 45px 5px 20px;
+            background: rgba(224, 223, 223, 0.6);
+            backdrop-filter: blur(2px);
+            outline: none;
+        }
+
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+        .input-field label{
+            position: absolute;
+            left: 20px;
+            top: 15px;
+            font-size: 15px;
+            transition: .3s ease-in-out;
+        }
+        .input-box:focus ~ label,.input-box:valid ~ label{
+            display: none;
+        }
+
+        .input-submit{
+            width: 100%;
+            height: 50px;
+            font-size: 15px;
+            font-weight: 500;
+            border: none;
+            border-radius: 10px;
+            background: #bc6202;
+            color: #fff;
+            box-shadow: 0px 4px 20px rgba(62, 9, 9, 0.145);
+            cursor: pointer;
+            margin-top: 10px;
+            transition: .4s;
+        }
+        .input-submit:hover{
+            background: #db3e00;
+            box-shadow: 0px 4px 20px rgba(62, 9, 9, 0.32);
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="box">
+
+        <div class="box-wifi-params" id="wifi-params">
+
+            <div class="top-header">
+                <h3>Déconnexion Wifi</h3>
+                <small>La jardinière est actuellement connecté au wifi, vous pouvez dès maintenant la configurer depuis l'application. </small>
+            </div>
+            <form action="/wifiLogout" method="post" class="input-group">
+                <div class="input-ssid">
+                    <label for="ssid_name">Connnecté à :</label>
+                    <input class="input-box" id="ssid_name" value="{{ssid_name}}" disabled>
+                </div>
+                <div class="input-field">
+                    <input type="submit" id="logoutBtn" class="input-submit" value="Deconnectez la jardinière">
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

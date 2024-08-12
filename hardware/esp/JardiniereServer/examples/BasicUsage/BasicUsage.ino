@@ -1,15 +1,12 @@
 #include <JardiniereServer.h>
-#include <DisplayManager.h>
 
 JardiniereServer jardinierServer;
-DisplayManager display;
 
 void setup() {
-    display.begin();
+    Serial.begin(115200);
     jardinierServer.begin();
 }
 
 void loop() {
     jardinierServer.loop();
-    display.handlePageChange();
 }

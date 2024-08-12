@@ -38,7 +38,7 @@ void JardiniereDatabase::loop() {
     	databaseIsConnect = false;
     }
 
-	if(databaseIsConnect){
+	if(databaseIsConnect && WiFi.status() == WL_CONNECTED){
 		digitalWrite(D5, HIGH);
 		sendingInterval();
 		handlePlanterParams();
@@ -75,15 +75,18 @@ void JardiniereDatabase::sendSensorData(){
 }
 
 void JardiniereDatabase::handlePlanterParams() {
-	if(WiFi.status() == WL_CONNECTED && Firebase.ready()){
+	if(Firebase.ready()){
 		String fullPath = "/plenters/" + espParams.uid;
 
 		if (Firebase.RTDB.getString(&fbdo, fullPath + "/name")) {
 			String name = fbdo.stringData();
 			if (name != espParams.esp_ssid) {
+			/*
 				espParams.esp_ssid = name;
 				eepromManager.clearEspParams();
 				eepromManager.saveEspParams(espParams);
+
+			 */
 			}
 		}
 		else {

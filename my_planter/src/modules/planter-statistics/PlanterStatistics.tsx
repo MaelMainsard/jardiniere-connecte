@@ -4,7 +4,10 @@ import {useLocation, useNavigate} from "react-router-dom";
 import {
     PlanterInfoInterface
 } from "../home/planters-section/components/planter-caroussel/entities/PlanterInfo.interface.ts";
-import {AirHumidityChart} from "./components/AirHumidityChart/AirHumidityChart.tsx";
+import {AirHumidityChart} from "./components/air-humidity-chart/AirHumidityChart.tsx";
+import {GroundHumidityChart} from "./components/ground-humidity-chart/GroundHumidityChart.tsx";
+import {LuminosityChart} from "./components/luminosity-chart/LuminosityChart.tsx";
+import {TemperatureChart} from "./components/temperature-chart/TemperatureChart.tsx";
 
 export const PlanterStatistics = () => {
 
@@ -32,9 +35,16 @@ export const PlanterStatistics = () => {
                 </div>
             </div>
 
-            <div className="flex flex-col m-10">
-                <h1 className="text-2xl font-bold mb-5">Air Humidity</h1>
+            <div className="flex flex-col overflow-scroll h-[80%]">
+                <h1 className="text-2xl font-bold mb-5 m-10">Air Humidity</h1>
                 <AirHumidityChart/>
+                <h1 className="text-2xl font-bold mb-5 m-10">Ground Humidity</h1>
+                <GroundHumidityChart/>
+                <h1 className="text-2xl font-bold mb-5 m-10">Luminosity</h1>
+                <LuminosityChart/>
+                <h1 className="text-2xl font-bold mb-5 m-10">Temperature</h1>
+                <TemperatureChart/>
+                <div className="mb-5"></div>
             </div>
 
             <div className="flex w-screen absolute bottom-0">

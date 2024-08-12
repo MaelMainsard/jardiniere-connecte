@@ -5,13 +5,12 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
-#include <LedManager.h>
 #include <EEPROMManager.h>
 #include <EspParams.h>
 #include <WifiParams.h>
+#include <FS.h>
 
 #define DNS_PORT 53
-#define MAX_NETWORKS 20
 
 class JardiniereServer {
 public:
@@ -20,33 +19,22 @@ public:
     void loop();
 
 private:
-    String availableSSIDs[MAX_NETWORKS];
-    int networkCount;
-
-    bool attemptingReconnect;
-    unsigned long lastReconnectAttempt;
-    const unsigned long reconnectInterval;
-	bool connectionInProgress;
 
     ESP8266WebServer webServer;
     DNSServer dnsServer;
-	LedManager ledManager;
     EEPROMManager eepromManager;
 
 	void init();
     void setupWebServerAndDNS();
-    void scanAvailableNetworks();
-	void scanAndReconnect();
-    void connectToWiFi(const WifiParams& params);
 
-    void handleRootRequest();
-    void handleFormSubmission();
+    void connectToWiFi(WifiParams params);
+    void handleWifiLogin();
+    void handleWifiLogout();
+
     void handleDisconnect();
+    String getSsidArray();
+    void handleRoot();
     void handleNotFound();
-    void handleDisconnectPage();
-
-    String generateMainPageHTML();
-    String generateDisconnectPageHTML();
 };
 
 #endif

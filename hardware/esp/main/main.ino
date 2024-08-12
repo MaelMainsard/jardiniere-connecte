@@ -1,20 +1,17 @@
 #include <JardiniereServer.h>
-#include <JardiniereDatabase.h>
-#include <DisplayManager.h>
+//#include <JardiniereDatabase.h>
 
 JardiniereServer jardinierServer;
-JardiniereDatabase jardinierDatabase;
-DisplayManager myDisplay;
+//JardiniereDatabase jardinierDatabase;
+
 
 void setup() {
-    myDisplay.begin();
-    jardinierDatabase.begin();
-    jardinierServer.begin();
     Serial.begin(115200);
+    //jardinierDatabase.begin();
+    jardinierServer.begin();
 }
 
 void loop() {
-    myDisplay.handlePageChange();
     jardinierServer.loop();
-    jardinierDatabase.loop();
+    //jardinierDatabase.loop();
 }
